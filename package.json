@@ -1,0 +1,39 @@
+{
+  "name": "jsharmony-cli",
+  "version": "1.0.0",
+  "description": "jsHarmony command-line interface",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha --reporter spec"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/apHarmony/jsharmony-cli"
+  },
+  "keywords": [
+    "jsHarmony",
+    "generator",
+    "cli",
+    "command-line",
+    "command line",
+    "interface",
+    "JavaScript"
+  ],
+  "author": "apHarmony <contact@apharmony.com> (http://www.apharmony.com/)",
+  "license": "LGPL-3.0",
+  "bugs": {
+    "url": "https://github.com/apHarmony/jsharmony-cli/issues"
+  },
+  "homepage": "https://github.com/apHarmony/jsharmony-cli",
+  "devDependencies": {
+    "mocha": "^2.0.0"
+  },
+  "dependencies": {
+    "async": "^2.1.0",
+    "form-data": "^2.1.0",
+    "lodash": "^4.14.0"
+  },
+  "bin": {
+    "jsharmony": "./index.js"
+  }
+}
