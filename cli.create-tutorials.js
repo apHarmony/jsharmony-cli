@@ -23,7 +23,7 @@ var xlib = wclib.xlib;
 var path = require('path');
 var fs = require('fs');
 var _ = require('lodash');
-var jshcli_InitDB = require('./cli.init-db.js');
+var jshcli_InitDatabase = require('./cli.init-database.js');
 
 exports = module.exports = {};
 
@@ -222,7 +222,7 @@ exports.Run = function(params, onSuccess){
   //XXX This needs to be added when the Tutorials Database is configured
   //Initialize jsHarmony Tutorials Database
   .then(function(){ return new Promise(function(resolve, reject){
-    jshcli_InitDB.Run(params,resolve);
+    jshcli_InitDatabase.Run(params,resolve);
   }); })
   */
 

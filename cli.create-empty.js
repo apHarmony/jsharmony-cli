@@ -23,7 +23,7 @@ var xlib = wclib.xlib;
 var path = require('path');
 var fs = require('fs');
 var _ = require('lodash');
-var jshcli_InitDB = require('./cli.init-db.js');
+var jshcli_InitDatabase = require('./cli.init-database.js');
 
 exports = module.exports = {};
 

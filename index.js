@@ -37,7 +37,8 @@ var jshcli_CreateFactory = require('./cli.create-factory.js');
 var jshcli_CreateEmpty = require('./cli.create-empty.js');
 var jshcli_CreateTutorials = require('./cli.create-tutorials.js');
 var jshcli_Generate = require('./cli.generate.js');
-var jshcli_InitDB = require('./cli.init-db.js');
+var jshcli_CreateDatabase = require('./cli.create-database.js');
+var jshcli_InitDatabase = require('./cli.init-database.js');
 
 global._IS_WINDOWS = /^win/.test(process.platform);
 global._NPM_CMD = global._IS_WINDOWS ? 'npm.cmd' : 'npm';
@@ -60,7 +61,8 @@ The following commands are available:\r\n\
 create factory   - Initializes a standard application\r\n\
 create empty     - Initializes empty scaffolding\r\n\
 create tutorials - Initializes the quickstart tutorials application\r\n\
-init db          - Initializes the jsHarmony Factory database\r\n\
+create database  - Creates a new jsHarmony Factory database\r\n\
+init database    - Adds jsHarmony Factory tables to an existing database\r\n\
 generate         - Auto-generate models based on the database schema\r\n\
     -t [DATABASE TABLE]  Database table name, or * for all tables (required)\r\n\
     -f [FILENAME]        Output filename (optional)\r\n\
@@ -70,7 +72,8 @@ global.commands = {
   'create factory': jshcli_CreateFactory.Run,
   'create tutorials': jshcli_CreateTutorials.Run,
   'create empty': jshcli_CreateEmpty.Run,
-  'init db': jshcli_InitDB.Run,
+  'create database': jshcli_CreateDatabase.Run,
+  'init database': jshcli_InitDatabase.Run,
   'generate': jshcli_Generate.Run,
 };
 global.start_time = new Date();
@@ -103,7 +106,7 @@ function ValidateParameters(onComplete){
   var cmd = args.shift();
   if(cmd=='create') cmd += ' ' + args.shift();
   if(cmd=='init') cmd += ' ' + args.shift();
-  if(!(cmd in global.commands)){ return sys_error('INVALID COMMAND: '+cmd); }
+  if(!(cmd in global.commands)){ return sys_error('INVALID COMMAND: '+cmd+"\r\n\r\nPlease run jsharmony without any arguments for arguments listing"); }
   while(args.length > 0){
     var arg = args.shift();
     if(cmd=='generate'){

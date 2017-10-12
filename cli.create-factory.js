@@ -23,17 +23,21 @@ var xlib = wclib.xlib;
 var path = require('path');
 var fs = require('fs');
 var _ = require('lodash');
-var jshcli_InitDB = require('./cli.init-db.js');
+var jshcli_InitDatabase = require('./cli.init-database.js');
 
 exports = module.exports = {};
 
 exports.Run = function(params, onSuccess){
   console.log('Running CreateFactory operation...');
-  console.log('\r\nThese settings can later be changed in your app.settings.js file');
-  console.log('\r\njsHarmony Factory requires a PostgreSQL or SQL Server database');
+  //console.log('\r\nThese settings can later be changed in your app.settings.js file');
+  console.log('\r\n*** jsHarmony Factory requires a PostgreSQL or SQL Server database');
 
   var jshconfig = {
-    path: process.cwd()
+    path: process.cwd(),
+    dbserver: '___DB_SERVER___',
+    dbname: '___DB_DBNAME___',
+    dbuser: '___DB_USER___',
+    dbpass: '___DB_PASS___'
   };
   jshconfig.projectname = path.basename(jshconfig.path);
 
@@ -44,7 +48,8 @@ exports.Run = function(params, onSuccess){
   ///*
   //Confirm that jsHarmony factory will be set up in the current folder
   .then(xlib.getStringAsync(function(){
-    console.log('\r\nThis will overwrite any existing configuration and set up the jsHarmony Factory in the current folder');
+    if(fs.readdirSync(jshconfig.path).length > 0) console.log('\r\nThis command will overwrite any existing configuration, and set up the jsHarmony Factory in the current folder');
+    else console.log('\r\nThis command will set up the jsHarmony Factory in the current folder');
     console.log(jshconfig.path);
     console.log('1) Yes');
     console.log('2) No');
@@ -66,6 +71,7 @@ exports.Run = function(params, onSuccess){
     else{ console.log('Invalid entry.  Please enter the number of your selection'); retry(); }
   }))
 
+  /*
   //Ask for the database server
   .then(xlib.getStringAsync(function(){
     if(jshconfig.dbserver) return false;
@@ -153,7 +159,8 @@ exports.Run = function(params, onSuccess){
     "start": "node app.js",\r\n\
     "install-windows-service": "winser -i",\r\n\
     "uninstall-windows-service": "winser -r",\r\n\
-    "init-factory": "node node_modules/jsharmony-factory/init/index.js"\r\n\
+    "create-database": "node node_modules/jsharmony-factory/init/create.js",\r\n\
+    "init-database": "node node_modules/jsharmony-factory/init/init.js"\r\n\
   },\r\n\
   "dependencies": {\r\n\
     "jsharmony": "^1.0.0",\r\n\
@@ -180,6 +187,8 @@ exports.Run = function(params, onSuccess){
   //Create folders if they do not exist
   .then(function(){ return new Promise(function(resolve, reject){
     xlib.createFolderIfNotExistsSync(jshconfig.path+'/data');
+    xlib.createFolderIfNotExistsSync(jshconfig.path+'/models');
+    xlib.createFolderIfNotExistsSync(jshconfig.path+'/models/_reports');
     resolve();
   }); })
 
@@ -218,13 +227,14 @@ exports.Run = function(params, onSuccess){
 
   //Ask user to install supervisor
   .then(xlib.getStringAsync(function(){
+    global._INSTALL_SUPERVISOR = false;
     if(global._FOUND_SUPERVISOR) return false;
     console.log('\r\nInstall "supervisor" package to auto-restart the jsHarmony server when models are updated?');
     console.log('1) Yes');
     console.log('2) No');
   },function(rslt,retry){
     if(rslt=="1"){ global._INSTALL_SUPERVISOR = true; return true; }
-    else if(rslt=="2"){ return false; }
+    else if(rslt=="2"){ return true; }
     else{ console.log('Invalid entry.  Please enter the number of your selection'); retry(); }
   }))
 
@@ -245,9 +255,28 @@ exports.Run = function(params, onSuccess){
     },undefined,function(err){ console.log('ERROR: Could not find or start '+global._NPM_CMD+'. Check to make sure Node.js and NPM is installed.'); });
   }); })
 
-  //Initialize jsHarmony Factory Database
+  //Ask to create a new database
+  .then(xlib.getStringAsync(function(){
+    global._CREATE_DATABASE = false;
+    console.log('\r\nA database is required to run the jsHarmony Factory');
+    console.log('\r\nCreate a new database for this jsHarmony Factory project?');
+    console.log('1) Yes');
+    console.log('2) No');
+  },function(rslt,retry){
+    if(rslt=="1"){ global._CREATE_DATABASE = true; return true; }
+    else if(rslt=="2"){ return true; }
+    else{ console.log('Invalid entry.  Please enter the number of your selection'); retry(); }
+  }))
+
+  //Create jsHarmony Factory Database
   .then(function(){ return new Promise(function(resolve, reject){
-    jshcli_InitDB.Run(params,resolve);
+    if(!global._CREATE_DATABASE){
+      console.log('\r\nPlease configure your database settings in '+jshconfig.path+'\\app.settings.js');
+      console.log('Then run "jsharmony init database" to set up the jsHarmony Factory tables in the existing database');
+      console.log('\r\nIf you decide to create a new database for the project, run "jsharmony create database" from the project root');
+      return resolve();
+    }
+    else jshcli_InitDatabase.Run(params,resolve);
   }); })
 
   .then(function(){ return new Promise(function(resolve, reject){
@@ -256,15 +285,6 @@ exports.Run = function(params, onSuccess){
 
   //Done
   .then(function(){
-    console.log('');
-    console.log('');
-    console.log('jsHarmony Factory has been initialized!');
-    console.log('');
-    console.log('** Please update the config in app.settings.js');
-    console.log('** Be sure to configure ports and HTTPS for security');
-    console.log('');
-    console.log('Start the server by running '+(global._IS_WINDOWS?'':'./')+global._NSTART_CMD);
-    console.log('');
   })
 
   .catch(function(err){

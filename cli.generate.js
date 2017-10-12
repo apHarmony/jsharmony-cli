@@ -24,7 +24,6 @@ var path = require('path');
 var fs = require('fs');
 var _ = require('lodash');
 var async = require('async');
-var jshcli_InitDB = require('./cli.init-db.js');
 var jshcli_Shared = require('./lib/cli.shared.js'); 
 var jsfapi = null;
 
@@ -187,7 +186,12 @@ exports.Run = function(params, onSuccess){
   //Done
   .then(function(){
     console.log("\r\n\r\nOperation complete.  The following models have been generated: \r\n");
-    for(var modelname in models) console.log(models_path + modelname + '.json');
+    if(params.OUTPUT_FILE){
+      console.log(params.OUTPUT_FILE);
+    }
+    else{
+      for(var modelname in models) console.log(models_path + modelname + '.json');
+    }
   })
 
   .then(function(){

@@ -18,7 +18,8 @@ The following commands are available:
 create factory   - Initializes a standard application
 create empty     - Initializes empty scaffolding
 create tutorials - Initializes the quickstart tutorials application
-init db          - Initializes the jsHarmony Factory database
+create database  - Creates a new jsHarmony Factory database
+init database    - Adds jsHarmony Factory tables to an existing database
 generate         - Auto-generate models based on the database schema
     -t [DATABASE TABLE]  Database table name, or * for all tables (required)
     -f [FILENAME]        Output filename (optional)
@@ -39,15 +40,19 @@ generate         - Auto-generate models based on the database schema
 
   ```jsharmony create empty```
 
-**4. Initialize the jsHarmony Factory database only (if an error occurred earlier)**
+**4. Creates a new jsHarmony Factory database**
 
-  ```jsharmony init db```
+  ```jsharmony create database```
 
-**5. Generate model files for all the tables in the database**
+**5. Initialize jsHarmony Factory tables in an existing database**
+
+  ```jsharmony init database```
+
+**6. Generate model files for all the tables in the database**
 
   ```generate -t *```
 
-**6. Generate model files for the "C" database table**
+**7. Generate model files for the "C" database table**
 
   ```generate -t C```
 
