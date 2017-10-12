@@ -30,14 +30,7 @@ exports.Run = function(params, onSuccess){
   console.log('\r\nRunning jsHarmony Factory DB Initialization Scripts');
   xlib.spawn(global._NPM_CMD,['run','-s','init-database'],function(code){ 
     if(code==0){ 
-      console.log('');
-      console.log('');
-      console.log('jsHarmony Factory has been initialized!');
-      console.log('');
-      console.log('** Please verify the configuration in '+process.cwd()+'\\app.settings.js');
-      console.log('** Be sure to configure ports and HTTPS for security');
-      console.log('');
-      console.log('Start the server by running '+(global._IS_WINDOWS?'':'./')+global._NSTART_CMD);
+      console.log('Then start the server by running '+(global._IS_WINDOWS?'':'./')+global._NSTART_CMD);
       console.log('');
       if(onSuccess) onSuccess(); return 
     }

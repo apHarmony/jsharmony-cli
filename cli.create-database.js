@@ -30,8 +30,9 @@ exports.Run = function(params, onSuccess){
   console.log('\r\nRunning jsHarmony Factory DB Creation Scripts');
   xlib.spawn(global._NPM_CMD,['run','-s','create-database'],function(code){ 
     if(code==0){ 
-      console.log('\r\nDatabase Creation complete');
-      if(onSuccess) onSuccess(); return 
+      console.log('Then start the server by running '+(global._IS_WINDOWS?'':'./')+global._NSTART_CMD);
+      console.log('');
+      if(onSuccess) onSuccess(); return;
     }
     console.log('\r\nDatabase Creation failed.');
     var jsf_path = process.cwd()+'/node_modules/jsharmony-factory';

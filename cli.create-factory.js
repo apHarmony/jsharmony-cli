@@ -23,7 +23,7 @@ var xlib = wclib.xlib;
 var path = require('path');
 var fs = require('fs');
 var _ = require('lodash');
-var jshcli_InitDatabase = require('./cli.init-database.js');
+var jshcli_CreateDatabase = require('./cli.create-database.js');
 
 exports = module.exports = {};
 
@@ -35,7 +35,7 @@ exports.Run = function(params, onSuccess){
   var jshconfig = {
     path: process.cwd(),
     dbserver: '___DB_SERVER___',
-    dbname: '___DB_DBNAME___',
+    dbname: '___DB_NAME___',
     dbuser: '___DB_USER___',
     dbpass: '___DB_PASS___'
   };
@@ -48,9 +48,10 @@ exports.Run = function(params, onSuccess){
   ///*
   //Confirm that jsHarmony factory will be set up in the current folder
   .then(xlib.getStringAsync(function(){
-    if(fs.readdirSync(jshconfig.path).length > 0) console.log('\r\nThis command will overwrite any existing configuration, and set up the jsHarmony Factory in the current folder');
-    else console.log('\r\nThis command will set up the jsHarmony Factory in the current folder');
+    if(fs.readdirSync(jshconfig.path).length > 0) console.log('\r\nThis command will overwrite any existing configuration, and set up the jsHarmony Factory in the current folder:');
+    else console.log('\r\nThis command will set up the jsHarmony Factory in the current folder:');
     console.log(jshconfig.path);
+    console.log('Continue with the operation?');
     console.log('1) Yes');
     console.log('2) No');
   },function(rslt,retry){
@@ -276,7 +277,7 @@ exports.Run = function(params, onSuccess){
       console.log('\r\nIf you decide to create a new database for the project, run "jsharmony create database" from the project root');
       return resolve();
     }
-    else jshcli_InitDatabase.Run(params,resolve);
+    else jshcli_CreateDatabase.Run(params,resolve);
   }); })
 
   .then(function(){ return new Promise(function(resolve, reject){
