@@ -274,7 +274,7 @@ exports.Run = function(params, onSuccess){
     if(!global._CREATE_DATABASE){
       console.log('\r\nPlease configure your database settings in '+jshconfig.path+'\\app.settings.js');
       console.log('Then run "jsharmony init database" to set up the jsHarmony Factory tables in the existing database');
-      console.log('\r\nIf you decide to create a new database for the project, run "jsharmony create database" from the project root');
+      console.log('\r\nIf you decide to create a new database for the project, instead run "jsharmony create database" from the project root to automatically create the database.');
       return resolve();
     }
     else jshcli_CreateDatabase.Run(params,resolve);

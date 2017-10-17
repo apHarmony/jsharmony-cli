@@ -29,9 +29,7 @@ exports = module.exports = {};
 exports.Run = function(params, onSuccess){
   console.log('\r\nRunning jsHarmony Factory DB Initialization Scripts');
   xlib.spawn(global._NPM_CMD,['run','-s','init-database'],function(code){ 
-    if(code==0){ 
-      console.log('Then start the server by running '+(global._IS_WINDOWS?'':'./')+global._NSTART_CMD);
-      console.log('');
+    if(code==0){
       if(onSuccess) onSuccess(); return 
     }
     console.log('\r\nDatabase Initialization failed.');
