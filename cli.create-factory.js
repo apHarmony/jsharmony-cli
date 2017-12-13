@@ -45,7 +45,6 @@ exports.Run = function(params, onSuccess){
 
   Promise.resolve()
   
-  ///*
   //Confirm that jsHarmony factory will be set up in the current folder
   .then(xlib.getStringAsync(function(){
     if(fs.readdirSync(jshconfig.path).length > 0) console.log('\r\nThis command will overwrite any existing configuration, and set up the jsHarmony Factory in the current folder:');
@@ -74,44 +73,6 @@ exports.Run = function(params, onSuccess){
     else{ console.log('Invalid entry.  Please enter the number of your selection'); retry(); }
   }))
 
-  /*
-  //Ask for the database server
-  .then(xlib.getStringAsync(function(){
-    if(jshconfig.dbserver) return false;
-    console.log('\r\nPlease enter the database server and/or port');
-  },function(rslt,retry){
-      if(rslt){ jshconfig.dbserver = rslt; return true; }
-      else{ console.log('Invalid entry.  Please enter a valid database server'); retry(); }
-  }))
-
-  //Ask for the database name
-  .then(xlib.getStringAsync(function(){
-    if(jshconfig.dbname) return false;
-    console.log('\r\nPlease enter the database name');
-  },function(rslt,retry){
-      if(rslt){ jshconfig.dbname = rslt; return true; }
-      else{ console.log('Invalid entry.  Please enter a valid database name'); retry(); }
-  }))
-
-  //Ask for the database user
-  .then(xlib.getStringAsync(function(){
-    if(jshconfig.dbuser) return false;
-    console.log('\r\nPlease enter the database user');
-  },function(rslt,retry){
-      if(rslt){ jshconfig.dbuser = rslt; return true; }
-      else{ console.log('Invalid entry.  Please enter a valid database user'); retry(); }
-  }))
-
-  //Ask for the database password
-  .then(xlib.getStringAsync(function(){
-    if(jshconfig.dbpass) return false;
-    console.log('\r\nPlease enter the database password');
-  },function(rslt,retry){
-      if(rslt){ jshconfig.dbpass = rslt; return true; }
-      else{ console.log('Invalid entry.  Please enter a valid database password'); retry(); }
-  }, '*'))
-  /* */
-  
   //Create app.js
   .then(function(){ return new Promise(function(resolve, reject){
     var rslt = "var jsHarmonyFactory = require('jsharmony-factory');\r\n";

@@ -41,7 +41,6 @@ exports.Run = function(params, onSuccess){
 
   Promise.resolve()
   
-  ///*
   //Confirm that jsHarmony Tutorials will be set up in the current folder
   .then(xlib.getStringAsync(function(){
     console.log('\r\nThis will overwrite any existing configuration and set up the jsHarmony Tutorials in the current folder');
@@ -53,61 +52,6 @@ exports.Run = function(params, onSuccess){
     else if(rslt=="2"){ return false; }
     else{ console.log('Invalid entry.  Please enter the number of your selection'); retry(); }
   }))
-
-  /*
-  //Ask for the database type
-  .then(xlib.getStringAsync(function(){
-    if(jshconfig.dbtype) return false;
-    console.log('\r\nPlease select a database type:');
-    console.log('1) PostgreSQL');
-    console.log('2) SQL Server');
-  },function(rslt,retry){
-    if(rslt=="1"){  jshconfig.dbtype = 'pgsql'; return true; }
-    else if(rslt=="2"){ jshconfig.dbtype = 'mssql'; return true; }
-    else if(rslt=="3"){ jshconfig.dbtype = 'sqlite'; return true; }
-    else{ console.log('Invalid entry.  Please enter the number of your selection'); retry(); }
-  }))
-
-  //Ask for the database server
-  .then(xlib.getStringAsync(function(){
-    if(jshconfig.dbserver) return false;
-    if(_.includes(['sqlite'],jshconfig.dbtype)) return false;
-    console.log('\r\nPlease enter the database server and/or port');
-  },function(rslt,retry){
-      if(rslt){ jshconfig.dbserver = rslt; return true; }
-      else{ console.log('Invalid entry.  Please enter a valid database server'); retry(); }
-  }))
-
-  //Ask for the database name
-  .then(xlib.getStringAsync(function(){
-    if(jshconfig.dbname) return false;
-    var _dbname_desc = ((jshconfig.dbtype == 'sqlite')?'path':'name');
-    console.log('\r\nPlease enter the database '+_dbname_desc);
-  },function(rslt,retry){
-      if(rslt){ jshconfig.dbname = rslt; return true; }
-      else{ console.log('Invalid entry.  Please enter a valid database '+_dbname_desc); retry(); }
-  }))
-
-  //Ask for the database user
-  .then(xlib.getStringAsync(function(){
-    if(jshconfig.dbuser) return false;
-    if(_.includes(['sqlite'],jshconfig.dbtype)) return false;
-    console.log('\r\nPlease enter the database user');
-  },function(rslt,retry){
-      if(rslt){ jshconfig.dbuser = rslt; return true; }
-      else{ console.log('Invalid entry.  Please enter a valid database user'); retry(); }
-  }))
-
-  //Ask for the database password
-  .then(xlib.getStringAsync(function(){
-    if(jshconfig.dbpass) return false;
-    if(_.includes(['sqlite'],jshconfig.dbtype)) return false;
-    console.log('\r\nPlease enter the database password');
-  },function(rslt,retry){
-      if(rslt){ jshconfig.dbpass = rslt; return true; }
-      else{ console.log('Invalid entry.  Please enter a valid database password'); retry(); }
-  }, '*'))
-  */
   
   //Create app.js
   .then(function(){ return new Promise(function(resolve, reject){
@@ -128,21 +72,6 @@ exports.Run = function(params, onSuccess){
   //Create app.settings.js
   .then(function(){ return new Promise(function(resolve, reject){
     var rslt = "";
-    /*
-    if(jshconfig.dbtype=='pgsql'){
-      rslt += "var pgsqlDBDriver = require('jsharmony-db-pgsql');\r\n";
-      rslt += "global.dbconfig = { _driver: new pgsqlDBDriver(), host: "+JSON.stringify(jshconfig.dbserver)+", database: "+JSON.stringify(jshconfig.dbname)+", user: "+JSON.stringify(jshconfig.dbuser)+", password: "+JSON.stringify(jshconfig.dbpass)+" };\r\n";
-    }
-    else if(jshconfig.dbtype=='mssql'){
-      rslt += "var mssqlDBDriver = require('jsharmony-db-mssql');\r\n";
-      rslt += "global.dbconfig = { _driver: new mssqlDBDriver(), server: "+JSON.stringify(jshconfig.dbserver)+", database: "+JSON.stringify(jshconfig.dbname)+", user: "+JSON.stringify(jshconfig.dbuser)+", password: "+JSON.stringify(jshconfig.dbpass)+" };\r\n";
-    }
-    else if(jshconfig.dbtype=='sqlite'){
-      rslt += "var sqliteDBDriver = require('jsharmony-db-sqlite');\r\n";
-      rslt += "global.dbconfig = { _driver: new sqliteDBDriver(), database: "+JSON.stringify(jshconfig.dbname)+"};\r\n";
-    }
-    rslt += "\r\n";
-    */
     rslt += "//global.http_port = 8080;\r\n";
     rslt += "//global.https_port = 8081;\r\n";
     rslt += "//global.https_cert = 'path/to/https-cert.pem';\r\n";
@@ -230,14 +159,6 @@ exports.Run = function(params, onSuccess){
       console.log(data);
     },undefined,function(err){ console.log('ERROR: Could not find or start '+global._NPM_CMD+'. Check to make sure Node.js and NPM is installed.'); });
   }); })
-
-  /*
-  //This needs to be added if the Tutorials Database needs to be configured
-  //Initialize jsHarmony Tutorials Database
-  .then(function(){ return new Promise(function(resolve, reject){
-    jshcli_InitDatabase.Run(params,resolve);
-  }); })
-  */
 
   //Done
   .then(function(){ return new Promise(function(resolve, reject){
