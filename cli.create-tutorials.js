@@ -54,6 +54,7 @@ exports.Run = function(params, onSuccess){
     else{ console.log('Invalid entry.  Please enter the number of your selection'); retry(); }
   }))
 
+  /*
   //Ask for the database type
   .then(xlib.getStringAsync(function(){
     if(jshconfig.dbtype) return false;
@@ -63,12 +64,14 @@ exports.Run = function(params, onSuccess){
   },function(rslt,retry){
     if(rslt=="1"){  jshconfig.dbtype = 'pgsql'; return true; }
     else if(rslt=="2"){ jshconfig.dbtype = 'mssql'; return true; }
+    else if(rslt=="3"){ jshconfig.dbtype = 'sqlite'; return true; }
     else{ console.log('Invalid entry.  Please enter the number of your selection'); retry(); }
   }))
 
   //Ask for the database server
   .then(xlib.getStringAsync(function(){
     if(jshconfig.dbserver) return false;
+    if(_.includes(['sqlite'],jshconfig.dbtype)) return false;
     console.log('\r\nPlease enter the database server and/or port');
   },function(rslt,retry){
       if(rslt){ jshconfig.dbserver = rslt; return true; }
@@ -78,15 +81,17 @@ exports.Run = function(params, onSuccess){
   //Ask for the database name
   .then(xlib.getStringAsync(function(){
     if(jshconfig.dbname) return false;
-    console.log('\r\nPlease enter the database name');
+    var _dbname_desc = ((jshconfig.dbtype == 'sqlite')?'path':'name');
+    console.log('\r\nPlease enter the database '+_dbname_desc);
   },function(rslt,retry){
       if(rslt){ jshconfig.dbname = rslt; return true; }
-      else{ console.log('Invalid entry.  Please enter a valid database name'); retry(); }
+      else{ console.log('Invalid entry.  Please enter a valid database '+_dbname_desc); retry(); }
   }))
 
   //Ask for the database user
   .then(xlib.getStringAsync(function(){
     if(jshconfig.dbuser) return false;
+    if(_.includes(['sqlite'],jshconfig.dbtype)) return false;
     console.log('\r\nPlease enter the database user');
   },function(rslt,retry){
       if(rslt){ jshconfig.dbuser = rslt; return true; }
@@ -96,12 +101,13 @@ exports.Run = function(params, onSuccess){
   //Ask for the database password
   .then(xlib.getStringAsync(function(){
     if(jshconfig.dbpass) return false;
+    if(_.includes(['sqlite'],jshconfig.dbtype)) return false;
     console.log('\r\nPlease enter the database password');
   },function(rslt,retry){
       if(rslt){ jshconfig.dbpass = rslt; return true; }
       else{ console.log('Invalid entry.  Please enter a valid database password'); retry(); }
   }, '*'))
-  /* */
+  */
   
   //Create app.js
   .then(function(){ return new Promise(function(resolve, reject){
@@ -122,6 +128,7 @@ exports.Run = function(params, onSuccess){
   //Create app.settings.js
   .then(function(){ return new Promise(function(resolve, reject){
     var rslt = "";
+    /*
     if(jshconfig.dbtype=='pgsql'){
       rslt += "var pgsqlDBDriver = require('jsharmony-db-pgsql');\r\n";
       rslt += "global.dbconfig = { _driver: new pgsqlDBDriver(), host: "+JSON.stringify(jshconfig.dbserver)+", database: "+JSON.stringify(jshconfig.dbname)+", user: "+JSON.stringify(jshconfig.dbuser)+", password: "+JSON.stringify(jshconfig.dbpass)+" };\r\n";
@@ -130,7 +137,12 @@ exports.Run = function(params, onSuccess){
       rslt += "var mssqlDBDriver = require('jsharmony-db-mssql');\r\n";
       rslt += "global.dbconfig = { _driver: new mssqlDBDriver(), server: "+JSON.stringify(jshconfig.dbserver)+", database: "+JSON.stringify(jshconfig.dbname)+", user: "+JSON.stringify(jshconfig.dbuser)+", password: "+JSON.stringify(jshconfig.dbpass)+" };\r\n";
     }
+    else if(jshconfig.dbtype=='sqlite'){
+      rslt += "var sqliteDBDriver = require('jsharmony-db-sqlite');\r\n";
+      rslt += "global.dbconfig = { _driver: new sqliteDBDriver(), database: "+JSON.stringify(jshconfig.dbname)+"};\r\n";
+    }
     rslt += "\r\n";
+    */
     rslt += "//global.http_port = 8080;\r\n";
     rslt += "//global.https_port = 8081;\r\n";
     rslt += "//global.https_cert = 'path/to/https-cert.pem';\r\n";
@@ -154,6 +166,7 @@ exports.Run = function(params, onSuccess){
     var db_dependency = '';
     if(jshconfig.dbtype=='pgsql') db_dependency = '"jsharmony-db-pgsql": "^1.0.0",';
     else if(jshconfig.dbtype=='mssql') db_dependency = '"jsharmony-db-mssql": "^1.0.0",';
+    else if(jshconfig.dbtype=='sqlite') db_dependency = '"jsharmony-db-sqlite": "^1.0.0",';
     rslt += '  "version": "0.0.1",\r\n\
   "private": true,\r\n\
   "scripts": {\r\n\
@@ -219,7 +232,7 @@ exports.Run = function(params, onSuccess){
   }); })
 
   /*
-  //XXX This needs to be added when the Tutorials Database is configured
+  //This needs to be added if the Tutorials Database needs to be configured
   //Initialize jsHarmony Tutorials Database
   .then(function(){ return new Promise(function(resolve, reject){
     jshcli_InitDatabase.Run(params,resolve);

@@ -48,6 +48,7 @@ global._FOUND_SUPERVISOR = false;
 global._INSTALL_SUPERVISOR = false;
 global._NPM_VER = '';
 global._NODE_VER = '';
+global._DEFAULT_SQLITE_PATH = 'data/db/project.db';
 
 global.debug = true;
 global.help_text = "\r\n\

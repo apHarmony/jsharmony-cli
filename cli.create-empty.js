@@ -59,17 +59,19 @@ exports.Run = function(params, onSuccess){
     console.log('\r\nPlease select a database type:');
     console.log('1) PostgreSQL');
     console.log('2) SQL Server');
-    console.log('3) None');
+    console.log('3) SQLite');
+    console.log('4) None');
   },function(rslt,retry){
     if(rslt=="1"){  jshconfig.dbtype = 'pgsql'; return true; }
     else if(rslt=="2"){ jshconfig.dbtype = 'mssql'; return true; }
-    else if(rslt=="3"){ jshconfig.dbtype = 'none'; return true; }
+    else if(rslt=="3"){ jshconfig.dbtype = 'sqlite'; return true; }
+    else if(rslt=="4"){ jshconfig.dbtype = 'none'; return true; }
     else{ console.log('Invalid entry.  Please enter the number of your selection'); retry(); }
   }))
 
   //Ask for the database server
   .then(xlib.getStringAsync(function(){
-    if(jshconfig.dbtype == 'none') return false;
+    if(_.includes(['none','sqlite'],jshconfig.dbtype)) return false;
     if(jshconfig.dbserver) return false;
     console.log('\r\nPlease enter the database server and/or port');
   },function(rslt,retry){
@@ -77,9 +79,32 @@ exports.Run = function(params, onSuccess){
       else{ console.log('Invalid entry.  Please enter a valid database server'); retry(); }
   }))
 
-  //Ask for the database name
+  //Ask for the database path, if applicable
   .then(xlib.getStringAsync(function(){
-    if(jshconfig.dbtype == 'none') return false;
+    if(!_.includes(['sqlite'],jshconfig.dbtype)) return false;
+    if(jshconfig.dbname) return false;
+    process.stdout.write('Database path ['+global._DEFAULT_SQLITE_PATH+']: ');
+  },function(rslt,retry){
+      if(!rslt) rslt = global._DEFAULT_SQLITE_PATH;
+      try{
+        var dbpath = path.resolve(rslt);
+        var dbfolder = path.dirname(dbpath);
+        xlib.createFolderRecursiveSync(dbfolder);
+        xlib.touchSync(dbpath);
+      }
+      catch(ex){
+        console.log(ex);
+        process.stdout.write('Error creating database.  Please enter a valid database path: '); 
+        retry();
+        return;
+      }
+      jshconfig.dbname = rslt;
+      return true;
+  }))
+
+  //Ask for the database name, if applicable
+  .then(xlib.getStringAsync(function(){
+    if(!_.includes(['pgsql','mssql'],jshconfig.dbtype)) return false;
     if(jshconfig.dbname) return false;
     console.log('\r\nPlease enter the database name');
   },function(rslt,retry){
@@ -89,7 +114,7 @@ exports.Run = function(params, onSuccess){
 
   //Ask for the database user
   .then(xlib.getStringAsync(function(){
-    if(jshconfig.dbtype == 'none') return false;
+    if(_.includes(['none','sqlite'],jshconfig.dbtype)) return false;
     if(jshconfig.dbuser) return false;
     console.log('\r\nPlease enter the database user');
   },function(rslt,retry){
@@ -99,7 +124,7 @@ exports.Run = function(params, onSuccess){
 
   //Ask for the database password
   .then(xlib.getStringAsync(function(){
-    if(jshconfig.dbtype == 'none') return false;
+    if(_.includes(['none','sqlite'],jshconfig.dbtype)) return false;
     if(jshconfig.dbpass) return false;
     console.log('\r\nPlease enter the database password');
   },function(rslt,retry){
@@ -118,6 +143,10 @@ exports.Run = function(params, onSuccess){
     else if(jshconfig.dbtype=='mssql'){
       rslt += "var mssqlDBDriver = require('jsharmony-db-mssql');\r\n";
       rslt += "global.dbconfig = { _driver: new mssqlDBDriver(), server: "+JSON.stringify(jshconfig.dbserver)+", database: "+JSON.stringify(jshconfig.dbname)+", user: "+JSON.stringify(jshconfig.dbuser)+", password: "+JSON.stringify(jshconfig.dbpass)+" };\r\n";
+    }
+    else if(jshconfig.dbtype=='sqlite'){
+      rslt += "var sqliteDBDriver = require('jsharmony-db-sqlite');\r\n";
+      rslt += "global.dbconfig = { _driver: new sqliteDBDriver(), database: "+JSON.stringify(jshconfig.dbname)+"};\r\n";
     }
     else if(jshconfig.dbtype=='none'){
     }
@@ -140,6 +169,7 @@ exports.Run = function(params, onSuccess){
     var db_dependency = '';
     if(jshconfig.dbtype=='pgsql') db_dependency = '"jsharmony-db-pgsql": "^1.0.0",';
     else if(jshconfig.dbtype=='mssql') db_dependency = '"jsharmony-db-mssql": "^1.0.0",';
+    else if(jshconfig.dbtype=='sqlite') db_dependency = '"jsharmony-db-sqlite": "^1.0.0",';
     rslt += '  "version": "0.0.1",\r\n\
   "private": true,\r\n\
   "scripts": {\r\n\

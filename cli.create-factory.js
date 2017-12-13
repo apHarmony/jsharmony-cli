@@ -66,9 +66,11 @@ exports.Run = function(params, onSuccess){
     console.log('\r\nPlease select a database type:');
     console.log('1) PostgreSQL');
     console.log('2) SQL Server');
+    console.log('3) SQLite');
   },function(rslt,retry){
     if(rslt=="1"){  jshconfig.dbtype = 'pgsql'; return true; }
     else if(rslt=="2"){ jshconfig.dbtype = 'mssql'; return true; }
+    else if(rslt=="3"){ jshconfig.dbtype = 'sqlite'; return true; }
     else{ console.log('Invalid entry.  Please enter the number of your selection'); retry(); }
   }))
 
@@ -130,6 +132,10 @@ exports.Run = function(params, onSuccess){
       rslt += "var mssqlDBDriver = require('jsharmony-db-mssql');\r\n";
       rslt += "global.dbconfig = { _driver: new mssqlDBDriver(), server: "+JSON.stringify(jshconfig.dbserver)+", database: "+JSON.stringify(jshconfig.dbname)+", user: "+JSON.stringify(jshconfig.dbuser)+", password: "+JSON.stringify(jshconfig.dbpass)+" };\r\n";
     }
+    else if(jshconfig.dbtype=='sqlite'){
+      rslt += "var sqliteDBDriver = require('jsharmony-db-sqlite');\r\n";
+      rslt += "global.dbconfig = { _driver: new sqliteDBDriver(), database: "+JSON.stringify(jshconfig.dbname)+"};\r\n";
+    }
     rslt += "\r\n";
     rslt += "//global.http_port = 8080;\r\n";
     rslt += "//global.https_port = 8081;\r\n";
@@ -154,6 +160,7 @@ exports.Run = function(params, onSuccess){
     var db_dependency = '';
     if(jshconfig.dbtype=='pgsql') db_dependency = '"jsharmony-db-pgsql": "^1.0.0",';
     else if(jshconfig.dbtype=='mssql') db_dependency = '"jsharmony-db-mssql": "^1.0.0",';
+    else if(jshconfig.dbtype=='sqlite') db_dependency = '"jsharmony-db-sqlite": "^1.0.0",';
     rslt += '  "version": "0.0.1",\r\n\
   "private": true,\r\n\
   "scripts": {\r\n\
