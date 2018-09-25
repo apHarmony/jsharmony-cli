@@ -24,18 +24,19 @@ var path = require('path');
 var fs = require('fs');
 var _ = require('lodash');
 var jshcli_InitDatabase = require('./cli.init-database.js');
+var jshcli_CreateDatabase = require('./cli.create-database.js');
 
 exports = module.exports = {};
 
 exports.Run = function(params, onSuccess){
   console.log('Running CreateTutorials operation...');
-  console.log('\r\nThese settings can later be changed in your app.settings.js file');
-  console.log('\r\njsHarmony Tutorials requires a PostgreSQL or SQL Server database');
+  console.log('\r\nThese settings can later be changed in your app.config.js file');
 
   var jshconfig = {
     path: process.cwd()
   };
   jshconfig.projectname = path.basename(jshconfig.path);
+  jshconfig.dbtype = 'sqlite';
 
   if(global.default_jshconfig) _.extend(jshconfig, global.default_jshconfig);
 
@@ -56,35 +57,40 @@ exports.Run = function(params, onSuccess){
   //Create app.js
   .then(function(){ return new Promise(function(resolve, reject){
     var rslt = "";
-    rslt += "global.onServerStart = function (servers){\r\n";
-    rslt += "  var port = global.http_port;\r\n";
-    rslt += "  if(servers && servers.length) port = servers[0].address().port;\r\n";
+    rslt += "var jsHarmonyTutorials = require('jsharmony-tutorials');\r\n";
+    rslt += "var jsh = new jsHarmonyTutorials.Application();\r\n";
+    rslt += "jsh.Config.onServerReady = function (){\r\n";
+    rslt += "  var port = jsh.Config.server.http_port;\r\n";
+    rslt += "  if(jsh.Servers['default'] && jsh.Servers['default'].servers && jsh.Servers['default'].servers.length) port = jsh.Servers['default'].servers[0].address().port;\r\n";
     rslt += "  var exec = require('child_process').exec;\r\n";
     rslt += "  exec('start http://localhost:'+port+'/', { });\r\n";
     rslt += "}\r\n";
-    rslt += "var jsHarmonyTutorials = require('jsharmony-tutorials');\r\n";
-    rslt += "var jshtutorials = new jsHarmonyTutorials();\r\n";
-    rslt += "jshtutorials.Run();\r\n";
+    rslt += "jsh.Run();\r\n";
     fs.writeFileSync(jshconfig.path+'/app.js', rslt);
     resolve();
   }); })
 
-  //Create app.settings.js
+  //Create app.config.js
   .then(function(){ return new Promise(function(resolve, reject){
-    var rslt = "";
-    rslt += "//global.http_port = 8080;\r\n";
-    rslt += "//global.https_port = 8081;\r\n";
-    rslt += "//global.https_cert = 'path/to/https-cert.pem';\r\n";
-    rslt += "//global.https_key = 'path/to/https-key.pem';\r\n";
-    rslt += "//global.https_ca = 'path/to/https-ca.crt';\r\n";
+    var rslt = "exports = module.exports = function(jsh, config, dbconfig){\r\n";
     rslt += "\r\n";
-    rslt += "global.clientsalt = "+JSON.stringify(xlib.getSalt(60))+";\r\n";
-    rslt += "global.clientcookiesalt = "+JSON.stringify(xlib.getSalt(60))+";\r\n";
-    rslt += "global.adminsalt = "+JSON.stringify(xlib.getSalt(60))+";\r\n";
-    rslt += "global.admincookiesalt = "+JSON.stringify(xlib.getSalt(60))+";\r\n";
-    rslt += "global.frontsalt = "+JSON.stringify(xlib.getSalt(60))+";\r\n";
-    
-    fs.writeFileSync(jshconfig.path+'/app.settings.js', rslt);
+    rslt += "  //Server Settings\r\n";
+    rslt += "  //config.server.http_port = 8080;\r\n";
+    rslt += "  //config.server.https_port = 8081;\r\n";
+    rslt += "  //config.server.https_cert = 'path/to/https-cert.pem';\r\n";
+    rslt += "  //config.server.https_key = 'path/to/https-key.pem';\r\n";
+    rslt += "  //config.server.https_ca = 'path/to/https-ca.crt';\r\n";
+    rslt += "  config.frontsalt = "+JSON.stringify(xlib.getSalt(60))+";\r\n";
+    rslt += "\r\n";
+    rslt += "  //jsHarmony Factory Configuration\r\n";
+    rslt += "  var configFactory = config.modules['jsHarmonyFactory'];\r\n";
+    rslt += "\r\n";
+    rslt += "  configFactory.clientsalt = "+JSON.stringify(xlib.getSalt(60))+";\r\n";
+    rslt += "  configFactory.clientcookiesalt = "+JSON.stringify(xlib.getSalt(60))+";\r\n";
+    rslt += "  configFactory.adminsalt = "+JSON.stringify(xlib.getSalt(60))+";\r\n";
+    rslt += "  configFactory.admincookiesalt = "+JSON.stringify(xlib.getSalt(60))+";\r\n";
+    rslt += "}\r\n";
+    fs.writeFileSync(jshconfig.path+'/app.config.js', rslt);
     resolve();
   }); })
   
@@ -99,7 +105,8 @@ exports.Run = function(params, onSuccess){
     rslt += '  "version": "0.0.1",\r\n\
   "private": true,\r\n\
   "scripts": {\r\n\
-    "start": "node app.js"\r\n\
+    "start": "node app.js",\r\n\
+    "create-database": "node node_modules/jsharmony-factory/init/create.js"\r\n\
   },\r\n\
   "dependencies": {\r\n\
     "jsharmony": "^1.0.0",\r\n\

@@ -46,13 +46,16 @@ exports.Run = function(params, onSuccess){
 
   Promise.resolve()
 
-  //Load Settings
+  //Load Config
   .then(function(){ return new Promise(function(resolve, reject){
-    jsfapi = jshcli_Shared.jsHarmonyFactoryAPI(jshconfig);
-    if(params.OUTPUT_PATH) models_path = params.OUTPUT_PATH + '/';
-    else if(params.OUTPUT_FILE) models_path = path.dirname(params.OUTPUT_FILE) + '/';
-    else models_path = global.appbasepath + '/models/';
-    resolve();
+    jsfapi = jshcli_Shared.jsHarmonyFactoryAPI(jshconfig, { db: params.DATABASE });
+
+    jsfapi.Init(function(){
+      if(params.OUTPUT_PATH) models_path = params.OUTPUT_PATH + '/';
+      else if(params.OUTPUT_FILE) models_path = path.dirname(params.OUTPUT_FILE) + '/';
+      else models_path = jsfapi.jsh.Config.appbasepath + '/models/';
+      resolve();
+    });
   }); })
 
   //Verify the output folder is accessible
@@ -92,7 +95,7 @@ exports.Run = function(params, onSuccess){
       }
       else table.name = tablestr;
     }
-    jsfapi.codegen.generateModels(table,function(err, messages, rslt){
+    jsfapi.codegen.generateModels(table,{ db: params.DATABASE },function(err, messages, rslt){
       if(err) return reject(err);
       if(messages.length > 0) gen_messages = gen_messages.concat(messages);
       models = rslt;

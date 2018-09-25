@@ -68,6 +68,7 @@ generate         - Auto-generate models based on the database schema\r\n\
     -t [DATABASE TABLE]  Database table name, or * for all tables (required)\r\n\
     -f [FILENAME]        Output filename (optional)\r\n\
     -d [PATH]            Output path (optional)\r\n\
+    -db [DATABASE]      Target database (optional)\r\n\
 ";
 global.commands = {
   'create factory': jshcli_CreateFactory.Run,
@@ -114,6 +115,7 @@ function ValidateParameters(onComplete){
       if(arg == '-t'){ if(args.length === 0){ return sys_error('Missing DATABASE TABLE: -t [DATABASE TABLE]'); } params.DATABASE_TABLE = args.shift(); continue; }
       else if(arg == '-f'){ if(args.length === 0){ return sys_error('Missing FILENAME: -f [FILENAME]'); } params.OUTPUT_FILE = args.shift(); continue; }
       else if(arg == '-d'){ if(args.length === 0){ return sys_error('Missing FILENAME: -d [PATH]'); } params.OUTPUT_PATH = args.shift(); continue; }
+      else if(arg == '-db'){ if(args.length === 0){ return sys_error('Missing DATABASE: -db [PATH]'); } params.DATABASE = args.shift(); continue; }
     }
     return sys_error('Invalid argument: '+arg);
   }

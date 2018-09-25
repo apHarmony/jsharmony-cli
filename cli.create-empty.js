@@ -29,7 +29,7 @@ exports = module.exports = {};
 
 exports.Run = function(params, onSuccess){
   console.log('Running CreateEmpty operation...');
-  console.log('\r\nConfiguration settings can be changed in the app.settings.js file');
+  console.log('\r\nConfiguration can be changed in the app.config.js file');
 
   var jshconfig = {
     path: process.cwd()
@@ -138,26 +138,37 @@ exports.Run = function(params, onSuccess){
     var rslt = "var jsHarmony = require('jsharmony');\r\n";
     if(jshconfig.dbtype=='pgsql'){
       rslt += "var pgsqlDBDriver = require('jsharmony-db-pgsql');\r\n";
-      rslt += "global.dbconfig = { _driver: new pgsqlDBDriver(), host: "+JSON.stringify(jshconfig.dbserver)+", database: "+JSON.stringify(jshconfig.dbname)+", user: "+JSON.stringify(jshconfig.dbuser)+", password: "+JSON.stringify(jshconfig.dbpass)+" };\r\n";
     }
     else if(jshconfig.dbtype=='mssql'){
       rslt += "var mssqlDBDriver = require('jsharmony-db-mssql');\r\n";
-      rslt += "global.dbconfig = { _driver: new mssqlDBDriver(), server: "+JSON.stringify(jshconfig.dbserver)+", database: "+JSON.stringify(jshconfig.dbname)+", user: "+JSON.stringify(jshconfig.dbuser)+", password: "+JSON.stringify(jshconfig.dbpass)+" };\r\n";
     }
     else if(jshconfig.dbtype=='sqlite'){
       rslt += "var sqliteDBDriver = require('jsharmony-db-sqlite');\r\n";
-      rslt += "global.dbconfig = { _driver: new sqliteDBDriver(), database: "+JSON.stringify(jshconfig.dbname)+"};\r\n";
+    }
+    rslt += "\r\n";
+    rslt += "var jsh = new jsHarmony();\r\n";
+
+    if(jshconfig.dbtype=='pgsql'){
+      rslt += "jsh.DBConfig['default'] = { _driver: new pgsqlDBDriver(), host: "+JSON.stringify(jshconfig.dbserver)+", database: "+JSON.stringify(jshconfig.dbname)+", user: "+JSON.stringify(jshconfig.dbuser)+", password: "+JSON.stringify(jshconfig.dbpass)+" };\r\n";
+    }
+    else if(jshconfig.dbtype=='mssql'){
+      rslt += "jsh.DBConfig['default'] = { _driver: new mssqlDBDriver(), server: "+JSON.stringify(jshconfig.dbserver)+", database: "+JSON.stringify(jshconfig.dbname)+", user: "+JSON.stringify(jshconfig.dbuser)+", password: "+JSON.stringify(jshconfig.dbpass)+" };\r\n";
+    }
+    else if(jshconfig.dbtype=='sqlite'){
+      rslt += "jsh.DBConfig['default'] = { _driver: new sqliteDBDriver(), database: "+JSON.stringify(jshconfig.dbname)+" };\r\n";
     }
     else if(jshconfig.dbtype=='none'){
     }
-    rslt += "var app = jsHarmony.Run({\r\n";
-    rslt += "// --- SERVER SETTINGS ---";
-    rslt += "//  http_port: 8080,\r\n";
-    rslt += "//  https_port: 8081,\r\n";
-    rslt += "//  https_cert: 'path/to/https-cert.pem',\r\n";
-    rslt += "//  https_key: 'path/to/https-key.pem',\r\n";
-    rslt += "//  https_ca: 'path/to/https-ca.crt',\r\n";
-    rslt += "});\r\n";
+    rslt += "\r\n";
+    rslt += "//Server Settings\r\n";
+    rslt += "//jsh.Config.server.http_port = 8080;\r\n";
+    rslt += "//jsh.Config.server.https_port = 8081;\r\n";
+    rslt += "//jsh.Config.server.https_cert = 'path/to/https-cert.pem';\r\n";
+    rslt += "//jsh.Config.server.https_key = 'path/to/https-key.pem';\r\n";
+    rslt += "//jsh.Config.server.https_ca = 'path/to/https-ca.crt';\r\n";
+    rslt += "jsh.Config.frontsalt = "+JSON.stringify(xlib.getSalt(60))+";\r\n";
+    rslt += "\r\n";
+    rslt += "jsh.Run();\r\n";
     fs.writeFileSync(jshconfig.path+'/app.js', rslt);
     resolve();
   }); })
@@ -193,7 +204,7 @@ exports.Run = function(params, onSuccess){
 
   //Create nstart
   .then(function(){ return new Promise(function(resolve, reject){
-    var rslt = 'supervisor -i clientjs,test,public,FSS,phantomjs.exe,data -w "./models,./views,./app.settings.js,./app.js" -e "node,js,json,css" node "./app.js"';
+    var rslt = 'supervisor -i clientjs,test,public,FSS,phantomjs.exe,data -w "./models,./views,./app.config.js,./app.js" -e "node,js,json,css" node "./app.js"';
     fs.writeFileSync(jshconfig.path+'/'+global._NSTART_CMD, rslt);
     resolve();
   }); })

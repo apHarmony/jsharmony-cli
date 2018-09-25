@@ -29,7 +29,7 @@ exports = module.exports = {};
 
 exports.Run = function(params, onSuccess){
   console.log('Running CreateFactory operation...');
-  //console.log('\r\nThese settings can later be changed in your app.settings.js file');
+  //console.log('\r\nThese settings can later be changed in your app.config.js file');
   console.log('\r\n*** jsHarmony Factory requires a PostgreSQL or SQL Server database');
 
   var jshconfig = {
@@ -76,41 +76,48 @@ exports.Run = function(params, onSuccess){
   //Create app.js
   .then(function(){ return new Promise(function(resolve, reject){
     var rslt = "var jsHarmonyFactory = require('jsharmony-factory');\r\n";
-    rslt += "var jsf = new jsHarmonyFactory();\r\n";
-    rslt += "jsf.Run();\r\n";
+    rslt += "var jsh = new jsHarmonyFactory.Application({},{});\r\n";
+    rslt += "jsh.Run();\r\n";
     fs.writeFileSync(jshconfig.path+'/app.js', rslt);
     resolve();
   }); })
 
-  //Create app.settings.js
+  //Create app.config.js
   .then(function(){ return new Promise(function(resolve, reject){
-    var rslt = "";
+    var rslt = "exports = module.exports = function(jsh, config, dbconfig){\r\n";
+    rslt += "\r\n";
+    rslt += "  //Database Configuration\r\n";
     if(jshconfig.dbtype=='pgsql'){
-      rslt += "var pgsqlDBDriver = require('jsharmony-db-pgsql');\r\n";
-      rslt += "global.dbconfig = { _driver: new pgsqlDBDriver(), host: "+JSON.stringify(jshconfig.dbserver)+", database: "+JSON.stringify(jshconfig.dbname)+", user: "+JSON.stringify(jshconfig.dbuser)+", password: "+JSON.stringify(jshconfig.dbpass)+" };\r\n";
+      rslt = "var pgsqlDBDriver = require('jsharmony-db-pgsql');\r\n\r\n"+rslt;
+      rslt += "  dbconfig['default'] = { _driver: new pgsqlDBDriver(), host: "+JSON.stringify(jshconfig.dbserver)+", database: "+JSON.stringify(jshconfig.dbname)+", user: "+JSON.stringify(jshconfig.dbuser)+", password: "+JSON.stringify(jshconfig.dbpass)+" };\r\n";
     }
     else if(jshconfig.dbtype=='mssql'){
-      rslt += "var mssqlDBDriver = require('jsharmony-db-mssql');\r\n";
-      rslt += "global.dbconfig = { _driver: new mssqlDBDriver(), server: "+JSON.stringify(jshconfig.dbserver)+", database: "+JSON.stringify(jshconfig.dbname)+", user: "+JSON.stringify(jshconfig.dbuser)+", password: "+JSON.stringify(jshconfig.dbpass)+" };\r\n";
+      rslt = "var mssqlDBDriver = require('jsharmony-db-mssql');\r\n\r\n"+rslt;
+      rslt += "  dbconfig['default'] = { _driver: new mssqlDBDriver(), server: "+JSON.stringify(jshconfig.dbserver)+", database: "+JSON.stringify(jshconfig.dbname)+", user: "+JSON.stringify(jshconfig.dbuser)+", password: "+JSON.stringify(jshconfig.dbpass)+" };\r\n";
     }
     else if(jshconfig.dbtype=='sqlite'){
-      rslt += "var sqliteDBDriver = require('jsharmony-db-sqlite');\r\n";
-      rslt += "global.dbconfig = { _driver: new sqliteDBDriver(), database: "+JSON.stringify(jshconfig.dbname)+"};\r\n";
+      rslt = "var sqliteDBDriver = require('jsharmony-db-sqlite');\r\n\r\n"+rslt;
+      rslt += "  dbconfig['default'] = { _driver: new sqliteDBDriver(), database: "+JSON.stringify(jshconfig.dbname)+" };\r\n";
     }
     rslt += "\r\n";
-    rslt += "//global.http_port = 8080;\r\n";
-    rslt += "//global.https_port = 8081;\r\n";
-    rslt += "//global.https_cert = 'path/to/https-cert.pem';\r\n";
-    rslt += "//global.https_key = 'path/to/https-key.pem';\r\n";
-    rslt += "//global.https_ca = 'path/to/https-ca.crt';\r\n";
+    rslt += "  //Server Settings\r\n";
+    rslt += "  //config.server.http_port = 8080;\r\n";
+    rslt += "  //config.server.https_port = 8081;\r\n";
+    rslt += "  //config.server.https_cert = 'path/to/https-cert.pem';\r\n";
+    rslt += "  //config.server.https_key = 'path/to/https-key.pem';\r\n";
+    rslt += "  //config.server.https_ca = 'path/to/https-ca.crt';\r\n";
+    rslt += "  config.frontsalt = "+JSON.stringify(xlib.getSalt(60))+";\r\n";
     rslt += "\r\n";
-    rslt += "global.clientsalt = "+JSON.stringify(xlib.getSalt(60))+";\r\n";
-    rslt += "global.clientcookiesalt = "+JSON.stringify(xlib.getSalt(60))+";\r\n";
-    rslt += "global.adminsalt = "+JSON.stringify(xlib.getSalt(60))+";\r\n";
-    rslt += "global.admincookiesalt = "+JSON.stringify(xlib.getSalt(60))+";\r\n";
-    rslt += "global.frontsalt = "+JSON.stringify(xlib.getSalt(60))+";\r\n";
+    rslt += "  //jsHarmony Factory Configuration\r\n";
+    rslt += "  var configFactory = config.modules['jsHarmonyFactory'];\r\n";
+    rslt += "\r\n";
+    rslt += "  configFactory.clientsalt = "+JSON.stringify(xlib.getSalt(60))+";\r\n";
+    rslt += "  configFactory.clientcookiesalt = "+JSON.stringify(xlib.getSalt(60))+";\r\n";
+    rslt += "  configFactory.adminsalt = "+JSON.stringify(xlib.getSalt(60))+";\r\n";
+    rslt += "  configFactory.admincookiesalt = "+JSON.stringify(xlib.getSalt(60))+";\r\n";
+    rslt += "}\r\n";
     
-    fs.writeFileSync(jshconfig.path+'/app.settings.js', rslt);
+    fs.writeFileSync(jshconfig.path+'/app.config.js', rslt);
     resolve();
   }); })
   
@@ -148,7 +155,7 @@ exports.Run = function(params, onSuccess){
 
   //Create nstart
   .then(function(){ return new Promise(function(resolve, reject){
-    var rslt = 'supervisor -i clientjs,test,public,FSS,phantomjs.exe,data -w "./models,./views,./app.settings.js,./app.js" -e "node,js,json,css" node "./app.js"';
+    var rslt = 'supervisor -i clientjs,test,public,FSS,phantomjs.exe,data -w "./models,./views,./app.config.js,./app.js" -e "node,js,json,css" node "./app.js"';
     fs.writeFileSync(jshconfig.path+'/'+global._NSTART_CMD, rslt);
     resolve();
   }); })
@@ -240,7 +247,7 @@ exports.Run = function(params, onSuccess){
   //Create jsHarmony Factory Database
   .then(function(){ return new Promise(function(resolve, reject){
     if(!global._CREATE_DATABASE){
-      console.log('\r\nPlease configure your database settings in '+jshconfig.path+'\\app.settings.js');
+      console.log('\r\nPlease configure your database settings in '+jshconfig.path+'\\app.config.js');
       console.log('Then run "jsharmony init database" to set up the jsHarmony Factory tables in the existing database');
       console.log('\r\nIf you decide to create a new database for the project, instead run "jsharmony create database" from the project root to automatically create the database.');
       return resolve();
