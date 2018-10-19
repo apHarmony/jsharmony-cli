@@ -113,8 +113,8 @@ exports.Run = function(params, onSuccess){
     rslt += "\r\n";
     rslt += "  configFactory.clientsalt = "+JSON.stringify(xlib.getSalt(60))+";\r\n";
     rslt += "  configFactory.clientcookiesalt = "+JSON.stringify(xlib.getSalt(60))+";\r\n";
-    rslt += "  configFactory.adminsalt = "+JSON.stringify(xlib.getSalt(60))+";\r\n";
-    rslt += "  configFactory.admincookiesalt = "+JSON.stringify(xlib.getSalt(60))+";\r\n";
+    rslt += "  configFactory.mainsalt = "+JSON.stringify(xlib.getSalt(60))+";\r\n";
+    rslt += "  configFactory.maincookiesalt = "+JSON.stringify(xlib.getSalt(60))+";\r\n";
     rslt += "}\r\n";
     
     fs.writeFileSync(jshconfig.path+'/app.config.js', rslt);

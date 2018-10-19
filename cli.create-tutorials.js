@@ -59,12 +59,13 @@ exports.Run = function(params, onSuccess){
     var rslt = "";
     rslt += "var jsHarmonyTutorials = require('jsharmony-tutorials');\r\n";
     rslt += "var jsh = new jsHarmonyTutorials.Application();\r\n";
-    rslt += "jsh.Config.onServerReady = function (){\r\n";
+    rslt += "jsh.Config.onServerReady.push(function(cb, servers){\r\n";
     rslt += "  var port = jsh.Config.server.http_port;\r\n";
     rslt += "  if(jsh.Servers['default'] && jsh.Servers['default'].servers && jsh.Servers['default'].servers.length) port = jsh.Servers['default'].servers[0].address().port;\r\n";
     rslt += "  var exec = require('child_process').exec;\r\n";
     rslt += "  exec('start http://localhost:'+port+'/', { });\r\n";
-    rslt += "}\r\n";
+    rslt += "  return cb();\r\n";
+    rslt += "});\r\n";
     rslt += "jsh.Run();\r\n";
     fs.writeFileSync(jshconfig.path+'/app.js', rslt);
     resolve();
@@ -87,8 +88,8 @@ exports.Run = function(params, onSuccess){
     rslt += "\r\n";
     rslt += "  configFactory.clientsalt = "+JSON.stringify(xlib.getSalt(60))+";\r\n";
     rslt += "  configFactory.clientcookiesalt = "+JSON.stringify(xlib.getSalt(60))+";\r\n";
-    rslt += "  configFactory.adminsalt = "+JSON.stringify(xlib.getSalt(60))+";\r\n";
-    rslt += "  configFactory.admincookiesalt = "+JSON.stringify(xlib.getSalt(60))+";\r\n";
+    rslt += "  configFactory.mainsalt = "+JSON.stringify(xlib.getSalt(60))+";\r\n";
+    rslt += "  configFactory.maincookiesalt = "+JSON.stringify(xlib.getSalt(60))+";\r\n";
     rslt += "}\r\n";
     fs.writeFileSync(jshconfig.path+'/app.config.js', rslt);
     resolve();
