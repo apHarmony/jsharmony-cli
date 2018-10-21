@@ -114,7 +114,7 @@ exports.Run = function(params, onSuccess){
     '+db_dependency+'\r\n\
     "jsharmony-factory": "^1.1.0",\r\n\
     "jsharmony-validate": "^1.1.0",\r\n\
-    "jsharmony-tutorials": "^1.1.0",\r\n\
+    "jsharmony-tutorials": "^1.0.0",\r\n\
     "winser": "^1.0.2"\r\n\
   },\r\n\
   "devDependencies": {\r\n\
