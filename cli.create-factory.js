@@ -126,9 +126,9 @@ exports.Run = function(params, onSuccess){
     var rslt = "{\r\n";
     rslt += '  "name": '+JSON.stringify(jshconfig.projectname)+',\r\n';
     var db_dependency = '';
-    if(jshconfig.dbtype=='pgsql') db_dependency = '"jsharmony-db-pgsql": "^1.0.0",';
-    else if(jshconfig.dbtype=='mssql') db_dependency = '"jsharmony-db-mssql": "^1.0.0",';
-    else if(jshconfig.dbtype=='sqlite') db_dependency = '"jsharmony-db-sqlite": "^1.0.0",';
+    if(jshconfig.dbtype=='pgsql') db_dependency = '"jsharmony-db-pgsql": "^1.1.0",';
+    else if(jshconfig.dbtype=='mssql') db_dependency = '"jsharmony-db-mssql": "^1.1.0",';
+    else if(jshconfig.dbtype=='sqlite') db_dependency = '"jsharmony-db-sqlite": "^1.1.0",';
     rslt += '  "version": "0.0.1",\r\n\
   "private": true,\r\n\
   "scripts": {\r\n\
@@ -139,14 +139,14 @@ exports.Run = function(params, onSuccess){
     "init-database": "node node_modules/jsharmony-factory/init/init.js"\r\n\
   },\r\n\
   "dependencies": {\r\n\
-    "jsharmony": "^1.0.0",\r\n\
+    "jsharmony": "^1.1.0",\r\n\
     '+db_dependency+'\r\n\
-    "jsharmony-factory": "^1.0.0",\r\n\
-    "jsharmony-validate": "^1.0.0",\r\n\
+    "jsharmony-factory": "^1.1.0",\r\n\
+    "jsharmony-validate": "^1.1.0",\r\n\
     "winser": "^1.0.2"\r\n\
   },\r\n\
   "devDependencies": {\r\n\
-    "mocha": "^3.2.0"\r\n\
+    "mocha": "^5.2.0"\r\n\
   }\r\n';
     rslt += "}\r\n";
     fs.writeFileSync(jshconfig.path+'/package.json', rslt);
