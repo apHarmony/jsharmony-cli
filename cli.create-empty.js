@@ -204,7 +204,7 @@ exports.Run = function(params, onSuccess){
 
   //Create nstart
   .then(function(){ return new Promise(function(resolve, reject){
-    var rslt = 'supervisor -i clientjs,test,public,FSS,phantomjs.exe,data -w "./models,./views,./app.config.js,./app.js" -e "node,js,json,css" node "./app.js"';
+    var rslt = 'supervisor -i test,public,data -w "./models,./views,./app.config.js,./app.js" -e "node,js,json,css" node "./app.js"';
     fs.writeFileSync(jshconfig.path+'/'+global._NSTART_CMD, rslt);
     resolve();
   }); })
