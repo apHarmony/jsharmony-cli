@@ -24,6 +24,7 @@ var path = require('path');
 var fs = require('fs');
 var _ = require('lodash');
 var jshcli_InitDatabase = require('./cli.init-database.js');
+var jshcli_Shared = require('./lib/cli.shared.js'); 
 
 exports = module.exports = {};
 
@@ -135,7 +136,8 @@ exports.Run = function(params, onSuccess){
   
   //Create app.js
   .then(function(){ return new Promise(function(resolve, reject){
-    var rslt = "var jsHarmony = require('jsharmony');\r\n";
+    var rslt = "#!/usr/bin/env node\r\n\r\n";
+    rslt += "var jsHarmony = require('jsharmony');\r\n";
     if(jshconfig.dbtype=='pgsql'){
       rslt += "var pgsqlDBDriver = require('jsharmony-db-pgsql');\r\n";
     }
@@ -169,7 +171,9 @@ exports.Run = function(params, onSuccess){
     rslt += "jsh.Config.frontsalt = "+JSON.stringify(xlib.getSalt(60))+";\r\n";
     rslt += "\r\n";
     rslt += "jsh.Run();\r\n";
+    if(!global._IS_WINDOWS) rslt = jshcli_Shared.dos2unix(rslt);
     fs.writeFileSync(jshconfig.path+'/app.js', rslt);
+    if(!global._IS_WINDOWS) fs.chmodSync(jshconfig.path+'/app.js', '755');
     resolve();
   }); })
   
@@ -206,6 +210,7 @@ exports.Run = function(params, onSuccess){
   .then(function(){ return new Promise(function(resolve, reject){
     var rslt = 'supervisor -i test,public,data -w "./models,./views,./app.config.js,./app.js" -e "node,js,json,css" node "./app.js"';
     fs.writeFileSync(jshconfig.path+'/'+global._NSTART_CMD, rslt);
+    if(!global._IS_WINDOWS) fs.chmodSync(jshconfig.path+'/'+global._NSTART_CMD, '755');
     resolve();
   }); })
 

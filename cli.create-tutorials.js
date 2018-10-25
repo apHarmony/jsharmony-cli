@@ -25,6 +25,7 @@ var fs = require('fs');
 var _ = require('lodash');
 var jshcli_InitDatabase = require('./cli.init-database.js');
 var jshcli_CreateDatabase = require('./cli.create-database.js');
+var jshcli_Shared = require('./lib/cli.shared.js'); 
 
 exports = module.exports = {};
 
@@ -56,7 +57,7 @@ exports.Run = function(params, onSuccess){
   
   //Create app.js
   .then(function(){ return new Promise(function(resolve, reject){
-    var rslt = "";
+    var rslt = "#!/usr/bin/env node\r\n\r\n";
     rslt += "var jsHarmonyTutorials = require('jsharmony-tutorials');\r\n";
     rslt += "var jsh = new jsHarmonyTutorials.Application();\r\n";
     rslt += "jsh.Config.onServerReady.push(function(cb, servers){\r\n";
@@ -67,7 +68,9 @@ exports.Run = function(params, onSuccess){
     rslt += "  return cb();\r\n";
     rslt += "});\r\n";
     rslt += "jsh.Run();\r\n";
+    if(!global._IS_WINDOWS) rslt = jshcli_Shared.dos2unix(rslt);
     fs.writeFileSync(jshconfig.path+'/app.js', rslt);
+    if(!global._IS_WINDOWS) fs.chmodSync(jshconfig.path+'/app.js', '755');
     resolve();
   }); })
 
@@ -129,6 +132,7 @@ exports.Run = function(params, onSuccess){
   .then(function(){ return new Promise(function(resolve, reject){
     var rslt = 'node "./app.js"';
     fs.writeFileSync(jshconfig.path+'/'+global._NSTART_CMD, rslt);
+    if(!global._IS_WINDOWS) fs.chmodSync(jshconfig.path+'/'+global._NSTART_CMD, '755');
     resolve();
   }); })
 
