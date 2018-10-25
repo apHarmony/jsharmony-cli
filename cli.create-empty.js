@@ -276,7 +276,7 @@ exports.Run = function(params, onSuccess){
   //Run npm install
   .then(function(){ return new Promise(function(resolve, reject){
     console.log('\r\nInstalling local dependencies');
-    xlib.spawn(global._NPM_CMD,['update'],function(code){ resolve(); },function(data){
+    xlib.spawn(global._NPM_CMD,['install'],function(code){ resolve(); },function(data){
       console.log(data);
     },undefined,function(err){ console.log('ERROR: Could not find or start '+global._NPM_CMD+'. Check to make sure Node.js and NPM is installed.'); });
   }); })
