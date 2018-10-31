@@ -159,7 +159,7 @@ exports.Run = function(params, onSuccess){
 
   //Create nstart
   .then(function(){ return new Promise(function(resolve, reject){
-    var rslt = 'supervisor -i test,public,data -w "./models,./views,./app.config.js,./app.js" -e "node,js,json,css,sql" node "./app.js"';
+    var rslt = 'supervisor -i test,public,data -w "./models,./views,./app.config.js,./app.js" -e "node,js,json,css,sql,styl" node "./app.js"';
     fs.writeFileSync(jshconfig.path+'/'+global._NSTART_CMD, rslt);
     if(!global._IS_WINDOWS) fs.chmodSync(jshconfig.path+'/'+global._NSTART_CMD, '755');
     resolve();
@@ -169,7 +169,7 @@ exports.Run = function(params, onSuccess){
   .then(function(){ return new Promise(function(resolve, reject){
     xlib.createFolderIfNotExistsSync(jshconfig.path+'/data');
     xlib.createFolderIfNotExistsSync(jshconfig.path+'/models');
-    xlib.createFolderIfNotExistsSync(jshconfig.path+'/models/_reports');
+    xlib.createFolderIfNotExistsSync(jshconfig.path+'/models/reports');
     resolve();
   }); })
 
