@@ -87,7 +87,7 @@ exports.Run = function(params, onSuccess){
     rslt += "  configFactory.mainsalt = "+JSON.stringify(xlib.getSalt(60))+";\r\n";
     rslt += "  configFactory.maincookiesalt = "+JSON.stringify(xlib.getSalt(60))+";\r\n";
     rslt += "  \r\n";
-    rslt += "  jsh.Config.onServerReady.push(function(cb, servers){\r\n";
+    rslt += "  config.onServerReady.push(function(cb, servers){\r\n";
     rslt += "    var port = jsh.Config.server.http_port;\r\n";
     rslt += "    if(jsh.Servers['default'] && jsh.Servers['default'].servers && jsh.Servers['default'].servers.length) port = jsh.Servers['default'].servers[0].address().port;\r\n";
     rslt += "    var exec = require('child_process').exec;\r\n";
