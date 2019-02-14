@@ -95,7 +95,7 @@ exports.Run = function(params, onSuccess){
       }
       else table.name = tablestr;
     }
-    jsfapi.codegen.generateModels(table,{ db: params.DATABASE },function(err, messages, rslt){
+    jsfapi.codegen.generateModels(table,{ db: params.DATABASE, short: true },function(err, messages, rslt){
       if(err) return reject(err);
       if(messages.length > 0) gen_messages = gen_messages.concat(messages);
       models = rslt;
