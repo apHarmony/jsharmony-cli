@@ -111,7 +111,8 @@ exports.Run = function(params, onSuccess){
   "private": true,\r\n\
   "scripts": {\r\n\
     "start": "node app.js",\r\n\
-    "create-database": "node node_modules/jsharmony-factory/init/create.js"\r\n\
+    "create-database": "node node_modules/jsharmony-factory/init/create.js",\r\n\
+    "test-screenshots": "mocha node_modules/jsharmony-tutorials/test/screenshots.js"\r\n\
   },\r\n\
   "dependencies": {\r\n\
     "jsharmony": "^1.1.0",\r\n\
