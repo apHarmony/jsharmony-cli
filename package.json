@@ -1,6 +1,6 @@
 {
   "name": "jsharmony-cli",
-  "version": "1.1.15",
+  "version": "1.1.16",
   "description": "jsHarmony command-line interface",
   "main": "index.js",
   "scripts": {
@@ -29,9 +29,9 @@
     "mocha": "^5.2.0"
   },
   "dependencies": {
-    "async": "^2.1.0",
-    "form-data": "^2.1.0",
-    "lodash": "^4.14.0"
+    "async": "^2.6.2",
+    "form-data": "^2.3.3",
+    "lodash": "^4.17.11"
   },
   "bin": {
     "jsharmony": "./index.js"
