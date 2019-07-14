@@ -78,7 +78,7 @@ exports.Run = function(params, onSuccess){
   .then(function(){ return new Promise(function(resolve, reject){
     var rslt = "#!/usr/bin/env node\r\n\r\n";
     rslt += "var jsHarmonyFactory = require('jsharmony-factory');\r\n";
-    rslt += "var jsh = new jsHarmonyFactory.Application({},{});\r\n";
+    rslt += "var jsh = new jsHarmonyFactory.Application({ clientPortal: true });\r\n";
     rslt += "jsh.Run();\r\n";
     if(!global._IS_WINDOWS) rslt = jshcli_Shared.dos2unix(rslt);
     fs.writeFileSync(jshconfig.path+'/app.js', rslt);
