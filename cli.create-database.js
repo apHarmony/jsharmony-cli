@@ -28,7 +28,12 @@ exports = module.exports = {};
 
 exports.Run = function(params, onSuccess){
   console.log('\r\nRunning jsHarmony Factory DB Creation Scripts');
-  xlib.spawn(global._NPM_CMD,['run','-s','create-database'],function(code){ 
+  var cmd = ['run','-s','create-database','--'];
+  if(typeof params.CLIENT_PORTAL != 'undefined'){
+    if(params.CLIENT_PORTAL) cmd.push('--with-client-portal');
+    else cmd.push('--no-client-portal');
+  }
+  xlib.spawn(global._NPM_CMD,cmd,function(code){ 
     if(code==0){ 
       if(onSuccess) onSuccess(); return;
     }

@@ -48,7 +48,7 @@ exports.Run = function(params, onSuccess){
   
   //Confirm that jsHarmony factory will be set up in the current folder
   .then(xlib.getStringAsync(function(){
-    if(fs.readdirSync(jshconfig.path).length > 0) console.log('\r\nThis command will overwrite any existing configuration, and set up the jsHarmony Factory in the current folder:');
+    if(fs.readdirSync(jshconfig.path).length > 0) console.log('\r\nThis command will overwrite any existing configuration and models, and set up the jsHarmony Factory in the current folder:');
     else console.log('\r\nThis command will set up the jsHarmony Factory in the current folder:');
     console.log(jshconfig.path);
     console.log('Continue with the operation?');
@@ -74,11 +74,28 @@ exports.Run = function(params, onSuccess){
     else{ console.log('Invalid entry.  Please enter the number of your selection'); retry(); }
   }))
 
+  //Ask about client portal
+  .then(xlib.getStringAsync(function(){
+    if(typeof params.CLIENT_PORTAL != 'undefined') return false;
+    console.log('\r\n-------------------------------------');
+    console.log('\r\nThe Client Portal component includes:');
+    console.log('\r\n> Scaffolding for Customers, Customer Users, and a Customer Dashboard');
+    console.log('> Client Portal site, accessible via the "/client" URL');
+    console.log('\r\nThe Client Portal can also be used as a template for projects that have one system for administrators and a separate system for users');
+    console.log('\r\Include the Client Portal in this project?');
+    console.log('1) Yes');
+    console.log('2) No');
+  },function(rslt,retry){
+    if(rslt=="1"){ params.CLIENT_PORTAL = true; return true; }
+    else if(rslt=="2"){ params.CLIENT_PORTAL = false; return true; }
+    else{ console.log('Invalid entry.  Please enter the number of your selection'); retry(); }
+  }))
+
   //Create app.js
   .then(function(){ return new Promise(function(resolve, reject){
     var rslt = "#!/usr/bin/env node\r\n\r\n";
     rslt += "var jsHarmonyFactory = require('jsharmony-factory');\r\n";
-    rslt += "var jsh = new jsHarmonyFactory.Application({ clientPortal: true });\r\n";
+    rslt += "var jsh = new jsHarmonyFactory.Application("+(params.CLIENT_PORTAL?'{ clientPortal: true }':'')+");\r\n";
     rslt += "jsh.Run();\r\n";
     if(!global._IS_WINDOWS) rslt = jshcli_Shared.dos2unix(rslt);
     fs.writeFileSync(jshconfig.path+'/app.js', rslt);
@@ -115,8 +132,10 @@ exports.Run = function(params, onSuccess){
     rslt += "  //jsHarmony Factory Configuration\r\n";
     rslt += "  var configFactory = config.modules['jsHarmonyFactory'];\r\n";
     rslt += "\r\n";
-    rslt += "  configFactory.clientsalt = "+JSON.stringify(xlib.getSalt(60))+";\r\n";
-    rslt += "  configFactory.clientcookiesalt = "+JSON.stringify(xlib.getSalt(60))+";\r\n";
+    if(params.CLIENT_PORTAL){
+      rslt += "  configFactory.clientsalt = "+JSON.stringify(xlib.getSalt(60))+";\r\n";
+      rslt += "  configFactory.clientcookiesalt = "+JSON.stringify(xlib.getSalt(60))+";\r\n";
+    }
     rslt += "  configFactory.mainsalt = "+JSON.stringify(xlib.getSalt(60))+";\r\n";
     rslt += "  configFactory.maincookiesalt = "+JSON.stringify(xlib.getSalt(60))+";\r\n";
     rslt += "}\r\n";
@@ -169,7 +188,6 @@ exports.Run = function(params, onSuccess){
   .then(function(){ return new Promise(function(resolve, reject){
     xlib.createFolderIfNotExistsSync(jshconfig.path+'/data');
     xlib.createFolderIfNotExistsSync(jshconfig.path+'/models');
-    xlib.createFolderIfNotExistsSync(jshconfig.path+'/models/reports');
     resolve();
   }); })
 
@@ -178,9 +196,9 @@ exports.Run = function(params, onSuccess){
     global._NODE_VER = process.versions.node;
     if(global._NODE_VER){
       global._NODE_VER = global._NODE_VER.split('.');
-      if(parseInt(global._NODE_VER[0])>=6) return resolve();
+      if(parseInt(global._NODE_VER[0])>=8) return resolve();
     }
-    console.log('ERROR: Please make sure Node.js 6 or higher is installed');
+    console.log('ERROR: Please make sure Node.js 8 or higher is installed');
   }); })
 
   //Check if NPM is installed
@@ -189,10 +207,10 @@ exports.Run = function(params, onSuccess){
       global._NPM_VER = data;
       if(global._NPM_VER){
         global._NPM_VER = global._NPM_VER.split('.');
-        if(parseInt(global._NPM_VER[0])>=3) return resolve();
-        console.log('ERROR: Please upgrade your NPM version to 3 or higher');
+        if(parseInt(global._NPM_VER[0])>=6) return resolve();
+        console.log('ERROR: Please upgrade your NPM version to 6 or higher');
       }
-    },undefined,function(err){ console.log('ERROR: Could not find or start '+global._NPM_CMD+'. Check to make sure Node.js and NPM is installed.'); });
+    },undefined,function(err){ console.log('ERROR: Could not find or start '+global._NPM_CMD+'. Check to make sure Node.js and NPM are installed.'); });
   }); })
 
   //Check if supervisor is installed
@@ -225,7 +243,7 @@ exports.Run = function(params, onSuccess){
     console.log('\r\nInstalling Node.js supervisor to auto-restart jsHarmony Factory');
     xlib.spawn(global._NPM_CMD,['install','-g','supervisor'],function(code){ resolve(); },function(data){
       console.log(data);
-    },undefined,function(err){ console.log('ERROR: Could not find or start '+global._NPM_CMD+'. Check to make sure Node.js and NPM is installed.'); });
+    },undefined,function(err){ console.log('ERROR: Could not find or start '+global._NPM_CMD+'. Check to make sure Node.js and NPM are installed.'); });
   }); })
 
   //Run npm install
@@ -233,7 +251,16 @@ exports.Run = function(params, onSuccess){
     console.log('\r\nInstalling local dependencies');
     xlib.spawn(global._NPM_CMD,['install'],function(code){ resolve(); },function(data){
       console.log(data);
-    },undefined,function(err){ console.log('ERROR: Could not find or start '+global._NPM_CMD+'. Check to make sure Node.js and NPM is installed.'); });
+    },undefined,function(err){ console.log('ERROR: Could not find or start '+global._NPM_CMD+'. Check to make sure Node.js and NPM are installed.'); });
+  }); })
+
+  //Copy Client Portal files, if applicable
+  .then(function(){ return new Promise(function(resolve, reject){
+    if(!params.CLIENT_PORTAL) return resolve();
+    jshcli_Shared.copyRecursive(path.join(jshconfig.path,'node_modules/jsharmony-factory/sample/client_portal'), path.join(jshconfig.path,'models'), {}, function(err){
+      if(err){ console.log('Error copying client portal models'); return reject(); }
+      return resolve();
+    });
   }); })
 
   //Ask to create a new database

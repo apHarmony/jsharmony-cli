@@ -60,10 +60,12 @@ Usage: jsharmony [command] [options]\r\n\
 The following commands are available:\r\n\
 \r\n\
 create factory   - Initializes a standard application\r\n\
+    --with-client-portal | --no-client-portal\r\n\
 create empty     - Initializes empty scaffolding\r\n\
 create tutorials - Initializes the quickstart tutorials application\r\n\
 create database  - Creates a new jsHarmony Factory database\r\n\
 init database    - Adds jsHarmony Factory tables to an existing database\r\n\
+    --with-client-portal | --no-client-portal\r\n\
 generate         - Auto-generate models based on the database schema\r\n\
     -t [DATABASE TABLE]  Database table name, or * for all tables (required)\r\n\
     -f [FILENAME]        Output filename (optional)\r\n\
@@ -116,6 +118,18 @@ function ValidateParameters(onComplete){
       else if(arg == '-f'){ if(args.length === 0){ return sys_error('Missing FILENAME: -f [FILENAME]'); } params.OUTPUT_FILE = args.shift(); continue; }
       else if(arg == '-d'){ if(args.length === 0){ return sys_error('Missing FILENAME: -d [PATH]'); } params.OUTPUT_PATH = args.shift(); continue; }
       else if(arg == '-db'){ if(args.length === 0){ return sys_error('Missing DATABASE: -db [PATH]'); } params.DATABASE = args.shift(); continue; }
+    }
+    else if(cmd=='create factory'){
+      if(arg == '--with-client-portal'){ params.CLIENT_PORTAL = true; continue; }
+      else if(arg == '--no-client-portal'){ params.CLIENT_PORTAL = false; continue; }
+    }
+    else if(cmd=='create database'){
+      if(arg == '--with-client-portal'){ params.CLIENT_PORTAL = true; continue; }
+      else if(arg == '--no-client-portal'){ params.CLIENT_PORTAL = false; continue; }
+    }
+    else if(cmd=='init database'){
+      if(arg == '--with-client-portal'){ params.CLIENT_PORTAL = true; continue; }
+      else if(arg == '--no-client-portal'){ params.CLIENT_PORTAL = false; continue; }
     }
     return sys_error('Invalid argument: '+arg);
   }
