@@ -36,7 +36,8 @@ if(fs.existsSync(path_TestDBConfig)){
 var jshcli_CreateFactory = require('./cli.create-factory.js');
 var jshcli_CreateEmpty = require('./cli.create-empty.js');
 var jshcli_CreateTutorials = require('./cli.create-tutorials.js');
-var jshcli_Generate = require('./cli.generate.js');
+var jshcli_GenerateModels = require('./cli.generate-models.js');
+var jshcli_GenerateSQLObjects = require('./cli.generate-sqlobjects.js');
 var jshcli_CreateDatabase = require('./cli.create-database.js');
 var jshcli_InitDatabase = require('./cli.init-database.js');
 
@@ -66,11 +67,17 @@ create tutorials - Initializes the quickstart tutorials application\r\n\
 create database  - Creates a new jsHarmony Factory database\r\n\
 init database    - Adds jsHarmony Factory tables to an existing database\r\n\
     --with-client-portal | --no-client-portal\r\n\
-generate         - Auto-generate models based on the database schema\r\n\
+generate models  - Auto-generate models based on the database schema\r\n\
     -t [DATABASE TABLE]  Database table name, or * for all tables (required)\r\n\
     -f [FILENAME]        Output filename (optional)\r\n\
     -d [PATH]            Output path (optional)\r\n\
     -db [DATABASE]      Target database (optional)\r\n\
+generate sqlobjects - Auto-generate sqlobjects based on the database schema\r\n\
+    -t [DATABASE TABLE]  Database table name, or * for all tables (required)\r\n\
+    -f [FILENAME]        Output filename (optional)\r\n\
+    -d [PATH]            Output path (optional)\r\n\
+    -db [DATABASE]       Target database (optional)\r\n\
+    --with-data          Include data in generated models\r\n\
 ";
 global.commands = {
   'create factory': jshcli_CreateFactory.Run,
@@ -78,7 +85,8 @@ global.commands = {
   'create empty': jshcli_CreateEmpty.Run,
   'create database': jshcli_CreateDatabase.Run,
   'init database': jshcli_InitDatabase.Run,
-  'generate': jshcli_Generate.Run,
+  'generate models': jshcli_GenerateModels.Run,
+  'generate sqlobjects': jshcli_GenerateSQLObjects.Run,
 };
 global.start_time = new Date();
 
@@ -110,14 +118,22 @@ function ValidateParameters(onComplete){
   var cmd = args.shift();
   if(cmd=='create') cmd += ' ' + args.shift();
   if(cmd=='init') cmd += ' ' + args.shift();
+  if(cmd=='generate') cmd += ' ' + args.shift();
   if(!(cmd in global.commands)){ return sys_error('INVALID COMMAND: '+cmd+"\r\n\r\nPlease run jsharmony without any arguments for arguments listing"); }
   while(args.length > 0){
     var arg = args.shift();
-    if(cmd=='generate'){
+    if(cmd=='generate models'){
       if(arg == '-t'){ if(args.length === 0){ return sys_error('Missing DATABASE TABLE: -t [DATABASE TABLE]'); } params.DATABASE_TABLE = args.shift(); continue; }
       else if(arg == '-f'){ if(args.length === 0){ return sys_error('Missing FILENAME: -f [FILENAME]'); } params.OUTPUT_FILE = args.shift(); continue; }
       else if(arg == '-d'){ if(args.length === 0){ return sys_error('Missing FILENAME: -d [PATH]'); } params.OUTPUT_PATH = args.shift(); continue; }
       else if(arg == '-db'){ if(args.length === 0){ return sys_error('Missing DATABASE: -db [PATH]'); } params.DATABASE = args.shift(); continue; }
+    }
+    else if(cmd=='generate sqlobjects'){
+      if(arg == '-t'){ if(args.length === 0){ return sys_error('Missing DATABASE TABLE: -t [DATABASE TABLE]'); } params.DATABASE_TABLE = args.shift(); continue; }
+      else if(arg == '-f'){ if(args.length === 0){ return sys_error('Missing FILENAME: -f [FILENAME]'); } params.OUTPUT_FILE = args.shift(); continue; }
+      else if(arg == '-d'){ if(args.length === 0){ return sys_error('Missing FILENAME: -d [PATH]'); } params.OUTPUT_PATH = args.shift(); continue; }
+      else if(arg == '-db'){ if(args.length === 0){ return sys_error('Missing DATABASE: -db [PATH]'); } params.DATABASE = args.shift(); continue; }
+      else if(arg == '--with-data'){ params.WITH_DATA = true; continue; }
     }
     else if(cmd=='create factory'){
       if(arg == '--with-client-portal'){ params.CLIENT_PORTAL = true; continue; }
@@ -163,8 +179,12 @@ function ValidateParameters(onComplete){
 
   if(params.OUTPUT_FILE && params.OUTPUT_PATH){ return sys_error('Cannot use both OUTPUT_FILE and OUTPUT_PATH flags'); }
 
-  if(cmd=='generate'){
-    if(!params.DATABASE_TABLE){ return sys_error('Generate command requires a database table (-t) parameter.\r\nUse * for all tables'); }
+  if(cmd=='generate models'){
+    if(!params.DATABASE_TABLE){ return sys_error('Generate models command requires a database table (-t) parameter.\r\nUse * for all tables'); }
+  }
+
+  if(cmd=='generate sqlobjects'){
+    if(!params.DATABASE_TABLE){ return sys_error('Generate sqlobjects command requires a database table (-t) parameter.\r\nUse * for all tables'); }
   }
 
   if(onComplete) onComplete(cmd, params);

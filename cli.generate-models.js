@@ -30,7 +30,7 @@ var jsfapi = null;
 exports = module.exports = {};
 
 exports.Run = function(params, onSuccess){
-  console.log('Running Generate operation...');
+  console.log('Running Generate Models operation...');
 
   var jshconfig = {
     path: process.cwd()
