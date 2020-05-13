@@ -48,9 +48,31 @@ exports.Run = function(params, onSuccess){
   
   //Confirm that jsHarmony factory will be set up in the current folder
   .then(xlib.getStringAsync(function(){
-    if(fs.readdirSync(jshconfig.path).length > 0) console.log('\r\nThis command will overwrite any existing configuration and models, and set up the jsHarmony Factory in the current folder:');
-    else console.log('\r\nThis command will set up the jsHarmony Factory in the current folder:');
+    if(fs.readdirSync(jshconfig.path).length > 0){
+      console.log('\r\n');
+      console.log('=====================================================');
+      console.log(' __          __     _____  _   _ _____ _   _  _____ ');
+      console.log(' \\ \\        / /\\   |  __ \\| \\ | |_   _| \\ | |/ ____|');
+      console.log('  \\ \\  /\\  / /  \\  | |__) |  \\| | | | |  \\| | |  __ ');
+      console.log('   \\ \\/  \\/ / /\\ \\ |  _  /| . ` | | | | . ` | | |_ |');
+      console.log('    \\  /\\  / ____ \\| | \\ \\| |\\  |_| |_| |\\  | |__| |');
+      console.log('     \\/  \\/_/    \\_\\_|  \\_\\_| \\_|_____|_| \\_|\\_____|');
+      console.log('');
+      console.log('=====================================================');
+      console.log('=====================================================================');
+      console.log('One or more files were found in this folder!');
+      console.log('This command may delete and overwrite an existing project');
+      console.log('Existing configuration and models may be overwritten');
+      console.log('=====================================================================');
+      console.log('A new jsHarmony Factory instance will be set up in the current folder');
+    }
+    else{
+      console.log('\r\n');
+      console.log('=====================================================================');
+      console.log('This command will set up the jsHarmony Factory in the current folder:');
+    }
     console.log(jshconfig.path);
+    console.log('=====================================================================');
     console.log('Continue with the operation?');
     console.log('1) Yes');
     console.log('2) No');
