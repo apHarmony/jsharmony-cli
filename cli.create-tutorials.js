@@ -31,12 +31,11 @@ exports = module.exports = {};
 
 exports.Run = function(params, onSuccess){
   console.log('Running CreateTutorials operation...');
-  console.log('\r\nThese settings can later be changed in your app.config.js file');
 
   var jshconfig = {
     path: process.cwd()
   };
-  jshconfig.projectname = path.basename(jshconfig.path);
+  jshconfig.projectname = path.basename(jshconfig.path) || 'application';
   jshconfig.dbtype = 'sqlite';
 
   if(global.default_jshconfig) _.extend(jshconfig, global.default_jshconfig);
@@ -45,8 +44,33 @@ exports.Run = function(params, onSuccess){
   
   //Confirm that jsHarmony Tutorials will be set up in the current folder
   .then(xlib.getStringAsync(function(){
-    console.log('\r\nThis will overwrite any existing configuration and set up the jsHarmony Tutorials in the current folder');
+    var hasExistingFiles = _.difference(fs.readdirSync(jshconfig.path), ['.git']).length;
+    if(hasExistingFiles){
+      console.log('\r\n');
+      console.log('=====================================================');
+      console.log(' __          __     _____  _   _ _____ _   _  _____ ');
+      console.log(' \\ \\        / /\\   |  __ \\| \\ | |_   _| \\ | |/ ____|');
+      console.log('  \\ \\  /\\  / /  \\  | |__) |  \\| | | | |  \\| | |  __ ');
+      console.log('   \\ \\/  \\/ / /\\ \\ |  _  /| . ` | | | | . ` | | |_ |');
+      console.log('    \\  /\\  / ____ \\| | \\ \\| |\\  |_| |_| |\\  | |__| |');
+      console.log('     \\/  \\/_/    \\_\\_|  \\_\\_| \\_|_____|_| \\_|\\_____|');
+      console.log('');
+      console.log('=====================================================');
+      console.log('=====================================================================');
+      console.log('One or more files were found in this folder!');
+      console.log('This command may delete and overwrite an existing project');
+      console.log('Existing configuration and models may be overwritten');
+      console.log('=====================================================================');
+      console.log('A new jsHarmony Tutorials project will be set up in the current folder');
+    }
+    else{
+      console.log('\r\n');
+      console.log('=====================================================================');
+      console.log('This command will set up the jsHarmony Tutorials in the current folder:');
+    }
     console.log(jshconfig.path);
+    console.log('=====================================================================');
+    console.log('Continue with the operation?');
     console.log('1) Yes');
     console.log('2) No');
   },function(rslt,retry){
@@ -62,51 +86,16 @@ exports.Run = function(params, onSuccess){
     rslt += "var jsh = new jsHarmonyTutorials.Application();\r\n";
     rslt += "jsh.Run();\r\n";
     if(!global._IS_WINDOWS) rslt = jshcli_Shared.dos2unix(rslt);
-    fs.writeFileSync(jshconfig.path+'/app.js', rslt);
-    if(!global._IS_WINDOWS) fs.chmodSync(jshconfig.path+'/app.js', '755');
+    fs.writeFileSync(path.join(jshconfig.path,'app.js'), rslt);
+    if(!global._IS_WINDOWS) fs.chmodSync(path.join(jshconfig.path,'app.js'), '755');
     resolve();
   }); })
 
-  //Create app.config.js
-  .then(function(){ return new Promise(function(resolve, reject){
-    var rslt = "exports = module.exports = function(jsh, config, dbconfig){\r\n";
-    rslt += "\r\n";
-    rslt += "  //Server Settings\r\n";
-    rslt += "  //config.server.http_port = 8080;\r\n";
-    rslt += "  //config.server.https_port = 8081;\r\n";
-    rslt += "  //config.server.https_cert = 'path/to/https-cert.pem';\r\n";
-    rslt += "  //config.server.https_key = 'path/to/https-key.pem';\r\n";
-    rslt += "  //config.server.https_ca = 'path/to/https-ca.crt';\r\n";
-    rslt += "  config.frontsalt = "+JSON.stringify(xlib.getSalt(60))+";\r\n";
-    rslt += "  \r\n";
-    rslt += "  //jsHarmony Factory Configuration\r\n";
-    rslt += "  var configFactory = config.modules['jsHarmonyFactory'];\r\n";
-    rslt += "  \r\n";
-    rslt += "  configFactory.clientsalt = "+JSON.stringify(xlib.getSalt(60))+";\r\n";
-    rslt += "  configFactory.clientcookiesalt = "+JSON.stringify(xlib.getSalt(60))+";\r\n";
-    rslt += "  configFactory.mainsalt = "+JSON.stringify(xlib.getSalt(60))+";\r\n";
-    rslt += "  configFactory.maincookiesalt = "+JSON.stringify(xlib.getSalt(60))+";\r\n";
-    rslt += "  \r\n";
-    rslt += "  config.onServerReady.push(function(cb, servers){\r\n";
-    rslt += "    var port = jsh.Config.server.http_port;\r\n";
-    rslt += "    if(jsh.Servers['default'] && jsh.Servers['default'].servers && jsh.Servers['default'].servers.length) port = jsh.Servers['default'].servers[0].address().port;\r\n";
-    rslt += "    var exec = require('child_process').exec;\r\n";
-    rslt += "    exec('start http://localhost:'+port+'/', { });\r\n";
-    rslt += "    return cb();\r\n";
-    rslt += "  });\r\n";
-    rslt += "}\r\n";
-    fs.writeFileSync(jshconfig.path+'/app.config.js', rslt);
-    resolve();
-  }); })
-  
   //Create package.json
   .then(function(){ return new Promise(function(resolve, reject){
     var rslt = "{\r\n";
     rslt += '  "name": '+JSON.stringify(jshconfig.projectname)+',\r\n';
-    var db_dependency = '';
-    if(jshconfig.dbtype=='pgsql') db_dependency = '"jsharmony-db-pgsql": "^1.1.0",';
-    else if(jshconfig.dbtype=='mssql') db_dependency = '"jsharmony-db-mssql": "^1.1.0",';
-    else if(jshconfig.dbtype=='sqlite') db_dependency = '"jsharmony-db-sqlite": "^1.1.0",';
+    var db_dependency = '"jsharmony-db-sqlite": "^1.1.0",';
     rslt += '  "version": "0.0.1",\r\n\
   "private": true,\r\n\
   "scripts": {\r\n\
@@ -123,24 +112,34 @@ exports.Run = function(params, onSuccess){
     "winser": "^1.0.2"\r\n\
   },\r\n\
   "devDependencies": {\r\n\
-    "mocha": "^5.2.0"\r\n\
+    "mocha": "^7.2.0"\r\n\
   }\r\n';
     rslt += "}\r\n";
-    fs.writeFileSync(jshconfig.path+'/package.json', rslt);
+    fs.writeFileSync(path.join(jshconfig.path,'package.json'), rslt);
     resolve();
   }); })
 
   //Create nstart
   .then(function(){ return new Promise(function(resolve, reject){
     var rslt = 'node "./app.js"';
-    fs.writeFileSync(jshconfig.path+'/'+global._NSTART_CMD, rslt);
-    if(!global._IS_WINDOWS) fs.chmodSync(jshconfig.path+'/'+global._NSTART_CMD, '755');
+    fs.writeFileSync(path.join(jshconfig.path,global._NSTART_CMD), rslt);
+    if(!global._IS_WINDOWS) fs.chmodSync(path.join(jshconfig.path,global._NSTART_CMD), '755');
+    resolve();
+  }); })
+
+  //Create gitignore
+  .then(function(){ return new Promise(function(resolve, reject){
+    var ignorePaths = ['/app.config.*.js','/node_modules','/cert','/data'];
+    fs.writeFileSync(path.join(jshconfig.path,'.gitignore'), ignorePaths.join(global._EOL));
     resolve();
   }); })
 
   //Create folders if they do not exist
   .then(function(){ return new Promise(function(resolve, reject){
-    xlib.createFolderIfNotExistsSync(jshconfig.path+'/data');
+    xlib.createFolderIfNotExistsSync(path.join(jshconfig.path,'data'));
+    xlib.createFolderIfNotExistsSync(path.join(jshconfig.path,'data/db'));
+    xlib.createFolderIfNotExistsSync(path.join(jshconfig.path,'cert'));
+    xlib.createFolderIfNotExistsSync(path.join(jshconfig.path,'models'));
     resolve();
   }); })
 
@@ -172,6 +171,61 @@ exports.Run = function(params, onSuccess){
     xlib.spawn(global._NPM_CMD,['install'],function(code){ resolve(); },function(data){
       console.log(data);
     },undefined,function(err){ console.log('ERROR: Could not find or start '+global._NPM_CMD+'. Check to make sure Node.js and NPM is installed.'); });
+  }); })
+
+  //Create app.config.js
+  .then(function(){ return new Promise(function(resolve, reject){
+    var rslt = "exports = module.exports = function(jsh, config, dbconfig){\r\n";
+    rslt += "\r\n";
+    rslt += "}\r\n";
+    
+    fs.writeFileSync(path.join(jshconfig.path,'app.config.js'), rslt);
+    resolve();
+  }); })
+
+  //Create app.config.local.js
+  .then(function(){ return new Promise(function(resolve, reject){
+    var appConfig = {
+      header: '',
+      body: '',
+    };
+
+    var installerParams = {
+      xlib: xlib,
+      manifest: {
+        installer: {
+          jsharmony_factory_client_portal: true
+        }
+      }
+    };
+
+    //Save app.config.local.js to disk
+    var onComplete = function(err){
+      if(err) return reject(err);
+
+      var fdata = '';
+      if(appConfig.header) fdata += appConfig.header + "\r\n";
+      fdata += "exports = module.exports = function(jsh, config, dbconfig){\r\n";
+      fdata += "\r\n";
+      fdata += appConfig.body + "\r\n";
+      fdata += "  config.onServerReady.push(function(cb, servers){\r\n";
+      fdata += "    var port = jsh.Config.server.http_port;\r\n";
+      fdata += "    if(jsh.Servers['default'] && jsh.Servers['default'].servers && jsh.Servers['default'].servers.length) port = jsh.Servers['default'].servers[0].address().port;\r\n";
+      fdata += "    var exec = require('child_process').exec;\r\n";
+      fdata += "    exec('start http://localhost:'+port+'/', { });\r\n";
+      fdata += "    return cb();\r\n";
+      fdata += "  });\r\n";
+      fdata += "}\r\n";
+      fs.writeFile(path.join(jshconfig.path, 'app.config.local.js'), fdata, 'utf8', function(err){
+        if(err) return reject(err);
+        return resolve();
+      });
+    };
+
+    jshcli_Shared.getModulePath('jsharmony-factory/init/install.app.config.local.js', function(err, mpath){
+      if(err) return installer_cb();
+      require(mpath)(appConfig, installerParams, onComplete);
+    });
   }); })
 
   //Done

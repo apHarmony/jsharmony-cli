@@ -35,7 +35,7 @@ exports.Run = function(params, onSuccess){
   var jshconfig = {
     path: process.cwd()
   };
-  jshconfig.projectname = path.basename(jshconfig.path);
+  jshconfig.projectname = path.basename(jshconfig.path) || 'application';
 
   if(global.default_jshconfig) _.extend(jshconfig, global.default_jshconfig);
 

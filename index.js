@@ -27,24 +27,33 @@ var fs = require('fs');
 var _ = require('lodash');
 var os = require('os');
 
-var path_TestDBConfig = path.join(os.homedir(),'jsharmony/testDB.json');
-if(fs.existsSync(path_TestDBConfig)){
-  global.default_jshconfig = JSON.parse(fs.readFileSync(path_TestDBConfig,'utf8'));
-  console.log('\r\n==== Loading test database config ====\r\n'+path_TestDBConfig+'\r\n');
+var path_defaultConfig = path.join(os.homedir(),'jsharmony/cli.default.json');
+if(fs.existsSync(path_defaultConfig)){
+  try{
+  global.default_jshconfig = JSON.parse(fs.readFileSync(path_defaultConfig,'utf8'));
+  }
+  catch(ex){
+    throw new Error('Error reading default configuration from: '+path_defaultConfig);
+  }
+  console.log('\r\n==== Loading default configuration ====\r\n'+path_defaultConfig+'\r\n');
 }
 
 var jshcli_CreateFactory = require('./cli.create-factory.js');
+var jshcli_CreateProject = require('./cli.create-project.js');
 var jshcli_CreateEmpty = require('./cli.create-empty.js');
 var jshcli_CreateTutorials = require('./cli.create-tutorials.js');
-var jshcli_GenerateModels = require('./cli.generate-models.js');
-var jshcli_GenerateSQLObjects = require('./cli.generate-sqlobjects.js');
+
 var jshcli_CreateDatabase = require('./cli.create-database.js');
 var jshcli_InitDatabase = require('./cli.init-database.js');
+
+var jshcli_GenerateModels = require('./cli.generate-models.js');
+var jshcli_GenerateSQLObjects = require('./cli.generate-sqlobjects.js');
 
 global._IS_WINDOWS = /^win/.test(process.platform);
 global._NPM_CMD = global._IS_WINDOWS ? 'npm.cmd' : 'npm';
 global._NSTART_CMD = global._IS_WINDOWS ? 'nstart.cmd' : 'nstart.sh';
 global._SUPERVISOR_CMD = global._IS_WINDOWS ? 'supervisor.cmd' : 'supervisor';
+global._EOL = require('os').EOL;
 global._FOUND_SUPERVISOR = false;
 global._INSTALL_SUPERVISOR = false;
 global._NPM_VER = '';
@@ -60,14 +69,18 @@ Usage: jsharmony [command] [options]\r\n\
 \r\n\
 The following commands are available:\r\n\
 \r\n\
-create factory   - Initializes a standard application\r\n\
+create factory       - Initializes a standard application\r\n\
     --with-client-portal | --no-client-portal\r\n\
-create empty     - Initializes empty scaffolding\r\n\
-create tutorials - Initializes the quickstart tutorials application\r\n\
-create database  - Creates a new jsHarmony Factory database\r\n\
-init database    - Adds jsHarmony Factory tables to an existing database\r\n\
+create project [URL] - Initializes a jsHarmony Application from a Project URL\r\n\
+                         * A local filesystem path can also be used\r\n\
+create empty         - Initializes empty scaffolding\r\n\
+create tutorials     - Initializes the quickstart tutorials application\r\n\
+\r\n\
+create database      - Creates a new jsHarmony Factory database\r\n\
+init database        - Adds jsHarmony Factory tables to an existing database\r\n\
     --with-client-portal | --no-client-portal\r\n\
-generate models  - Auto-generate models based on the database schema\r\n\
+\r\n\
+generate models     - Auto-generate models based on the database schema\r\n\
     -t [DATABASE TABLE]  Database table name, or * for all tables (required)\r\n\
     -f [FILENAME]        Output filename (optional)\r\n\
     -d [PATH]            Output path (optional)\r\n\
@@ -84,6 +97,7 @@ global.commands = {
   'create tutorials': jshcli_CreateTutorials.Run,
   'create empty': jshcli_CreateEmpty.Run,
   'create database': jshcli_CreateDatabase.Run,
+  'create project': jshcli_CreateProject.Run,
   'init database': jshcli_InitDatabase.Run,
   'generate models': jshcli_GenerateModels.Run,
   'generate sqlobjects': jshcli_GenerateSQLObjects.Run,
@@ -138,6 +152,9 @@ function ValidateParameters(onComplete){
     else if(cmd=='create factory'){
       if(arg == '--with-client-portal'){ params.CLIENT_PORTAL = true; continue; }
       else if(arg == '--no-client-portal'){ params.CLIENT_PORTAL = false; continue; }
+    }
+    else if(cmd=='create project'){
+      if(!params.URL){ params.URL = arg; continue; }
     }
     else if(cmd=='create database'){
       if(arg == '--with-client-portal'){ params.CLIENT_PORTAL = true; continue; }

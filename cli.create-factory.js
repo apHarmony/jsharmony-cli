@@ -30,8 +30,7 @@ exports = module.exports = {};
 
 exports.Run = function(params, onSuccess){
   console.log('Running CreateFactory operation...');
-  //console.log('\r\nThese settings can later be changed in your app.config.js file');
-  console.log('\r\n*** jsHarmony Factory requires a PostgreSQL or SQL Server database');
+  console.log('\r\n*** jsHarmony Factory requires a PostgreSQL, SQL Server, or SQLite database');
 
   var jshconfig = {
     path: process.cwd(),
@@ -40,7 +39,7 @@ exports.Run = function(params, onSuccess){
     dbuser: '___DB_USER___',
     dbpass: '___DB_PASS___'
   };
-  jshconfig.projectname = path.basename(jshconfig.path);
+  jshconfig.projectname = path.basename(jshconfig.path) || 'application';
 
   if(global.default_jshconfig) _.extend(jshconfig, global.default_jshconfig);
 
@@ -48,7 +47,8 @@ exports.Run = function(params, onSuccess){
   
   //Confirm that jsHarmony factory will be set up in the current folder
   .then(xlib.getStringAsync(function(){
-    if(fs.readdirSync(jshconfig.path).length > 0){
+    var hasExistingFiles = _.difference(fs.readdirSync(jshconfig.path), ['.git']).length;
+    if(hasExistingFiles){
       console.log('\r\n');
       console.log('=====================================================');
       console.log(' __          __     _____  _   _ _____ _   _  _____ ');
@@ -88,7 +88,7 @@ exports.Run = function(params, onSuccess){
     console.log('\r\nPlease select a database type:');
     console.log('1) PostgreSQL');
     console.log('2) SQL Server');
-    console.log('3) SQLite');
+    console.log('3) SQLite (Built-in File Database)');
   },function(rslt,retry){
     if(rslt=="1"){  jshconfig.dbtype = 'pgsql'; return true; }
     else if(rslt=="2"){ jshconfig.dbtype = 'mssql'; return true; }
@@ -120,49 +120,8 @@ exports.Run = function(params, onSuccess){
     rslt += "var jsh = new jsHarmonyFactory.Application("+(params.CLIENT_PORTAL?'{ clientPortal: true }':'')+");\r\n";
     rslt += "jsh.Run();\r\n";
     if(!global._IS_WINDOWS) rslt = jshcli_Shared.dos2unix(rslt);
-    fs.writeFileSync(jshconfig.path+'/app.js', rslt);
-    if(!global._IS_WINDOWS) fs.chmodSync(jshconfig.path+'/app.js', '755');
-    resolve();
-  }); })
-
-  //Create app.config.js
-  .then(function(){ return new Promise(function(resolve, reject){
-    var rslt = "exports = module.exports = function(jsh, config, dbconfig){\r\n";
-    rslt += "\r\n";
-    rslt += "  //Database Configuration\r\n";
-    if(jshconfig.dbtype=='pgsql'){
-      rslt = "var pgsqlDBDriver = require('jsharmony-db-pgsql');\r\n\r\n"+rslt;
-      rslt += "  dbconfig['default'] = { _driver: new pgsqlDBDriver(), host: "+JSON.stringify(jshconfig.dbserver)+", database: "+JSON.stringify(jshconfig.dbname)+", user: "+JSON.stringify(jshconfig.dbuser)+", password: "+JSON.stringify(jshconfig.dbpass)+" };\r\n";
-    }
-    else if(jshconfig.dbtype=='mssql'){
-      rslt = "var mssqlDBDriver = require('jsharmony-db-mssql');\r\n\r\n"+rslt;
-      rslt += "  dbconfig['default'] = { _driver: new mssqlDBDriver(), server: "+JSON.stringify(jshconfig.dbserver)+", database: "+JSON.stringify(jshconfig.dbname)+", user: "+JSON.stringify(jshconfig.dbuser)+", password: "+JSON.stringify(jshconfig.dbpass)+" };\r\n";
-    }
-    else if(jshconfig.dbtype=='sqlite'){
-      rslt = "var sqliteDBDriver = require('jsharmony-db-sqlite');\r\n\r\n"+rslt;
-      rslt += "  dbconfig['default'] = { _driver: new sqliteDBDriver(), database: "+JSON.stringify(jshconfig.dbname)+" };\r\n";
-    }
-    rslt += "\r\n";
-    rslt += "  //Server Settings\r\n";
-    rslt += "  //config.server.http_port = 8080;\r\n";
-    rslt += "  //config.server.https_port = 8081;\r\n";
-    rslt += "  //config.server.https_cert = 'path/to/https-cert.pem';\r\n";
-    rslt += "  //config.server.https_key = 'path/to/https-key.pem';\r\n";
-    rslt += "  //config.server.https_ca = 'path/to/https-ca.crt';\r\n";
-    rslt += "  config.frontsalt = "+JSON.stringify(xlib.getSalt(60))+";\r\n";
-    rslt += "\r\n";
-    rslt += "  //jsHarmony Factory Configuration\r\n";
-    rslt += "  var configFactory = config.modules['jsHarmonyFactory'];\r\n";
-    rslt += "\r\n";
-    if(params.CLIENT_PORTAL){
-      rslt += "  configFactory.clientsalt = "+JSON.stringify(xlib.getSalt(60))+";\r\n";
-      rslt += "  configFactory.clientcookiesalt = "+JSON.stringify(xlib.getSalt(60))+";\r\n";
-    }
-    rslt += "  configFactory.mainsalt = "+JSON.stringify(xlib.getSalt(60))+";\r\n";
-    rslt += "  configFactory.maincookiesalt = "+JSON.stringify(xlib.getSalt(60))+";\r\n";
-    rslt += "}\r\n";
-    
-    fs.writeFileSync(jshconfig.path+'/app.config.js', rslt);
+    fs.writeFileSync(path.join(jshconfig.path,'app.js'), rslt);
+    if(!global._IS_WINDOWS) fs.chmodSync(path.join(jshconfig.path,'app.js'), '755');
     resolve();
   }); })
   
@@ -191,25 +150,39 @@ exports.Run = function(params, onSuccess){
     "winser": "^1.0.2"\r\n\
   },\r\n\
   "devDependencies": {\r\n\
-    "mocha": "^5.2.0"\r\n\
+    "mocha": "^7.2.0"\r\n\
   }\r\n';
     rslt += "}\r\n";
-    fs.writeFileSync(jshconfig.path+'/package.json', rslt);
+    fs.writeFileSync(path.join(jshconfig.path,'package.json'), rslt);
     resolve();
   }); })
 
   //Create nstart
   .then(function(){ return new Promise(function(resolve, reject){
-    var rslt = 'supervisor -i test,public,data -w "./models,./views,./app.config.js,./app.js" -e "node,js,json,css,sql,styl" node "./app.js"';
-    fs.writeFileSync(jshconfig.path+'/'+global._NSTART_CMD, rslt);
-    if(!global._IS_WINDOWS) fs.chmodSync(jshconfig.path+'/'+global._NSTART_CMD, '755');
+    var rslt = 'supervisor -i test,public,data -w "./models,./app.config.js,./app.config.local.js,./app.js" -e "node,js,json,css,sql,styl" node "./app.js"';
+    fs.writeFileSync(path.join(jshconfig.path,global._NSTART_CMD), rslt);
+    if(!global._IS_WINDOWS) fs.chmodSync(path.join(jshconfig.path,global._NSTART_CMD), '755');
+    resolve();
+  }); })
+
+  //Create gitignore
+  .then(function(){ return new Promise(function(resolve, reject){
+    var ignorePaths = ['/app.config.*.js','/node_modules','/cert','/data'];
+    fs.writeFileSync(path.join(jshconfig.path,'.gitignore'), ignorePaths.join(global._EOL));
     resolve();
   }); })
 
   //Create folders if they do not exist
   .then(function(){ return new Promise(function(resolve, reject){
-    xlib.createFolderIfNotExistsSync(jshconfig.path+'/data');
-    xlib.createFolderIfNotExistsSync(jshconfig.path+'/models');
+    xlib.createFolderIfNotExistsSync(path.join(jshconfig.path,'data'));
+    xlib.createFolderIfNotExistsSync(path.join(jshconfig.path,'cert'));
+    xlib.createFolderIfNotExistsSync(path.join(jshconfig.path,'models'));
+    if(jshconfig.dbtype=='sqlite'){
+      if(jshconfig.dbname && (jshconfig.dbname.substr(0,1) != ':')){
+        var dbparentdir = path.dirname(jshconfig.dbname);
+        if(dbparentdir && (dbparentdir != '.')) xlib.createFolderRecursiveSync(dbparentdir);
+      }
+    }
     resolve();
   }); })
 
@@ -276,6 +249,71 @@ exports.Run = function(params, onSuccess){
     },undefined,function(err){ console.log('ERROR: Could not find or start '+global._NPM_CMD+'. Check to make sure Node.js and NPM are installed.'); });
   }); })
 
+  //Create app.config.js
+  .then(function(){ return new Promise(function(resolve, reject){
+    var rslt = "exports = module.exports = function(jsh, config, dbconfig){\r\n";
+    rslt += "\r\n";
+    rslt += "}\r\n";
+    
+    fs.writeFileSync(path.join(jshconfig.path,'app.config.js'), rslt);
+    resolve();
+  }); })
+
+  //Create app.config.local.js
+  .then(function(){ return new Promise(function(resolve, reject){
+    var appConfig = {
+      header: '',
+      body: '',
+    };
+
+    var installerParams = {
+      xlib: xlib,
+      manifest: {
+        installer: {
+          jsharmony_factory_client_portal: !!params.CLIENT_PORTAL
+        }
+      }
+    };
+
+    //Add dbconfig
+    if(jshconfig.dbtype){
+      appConfig.body += "  //Database Configuration\r\n";
+      if(jshconfig.dbtype=='pgsql'){
+        appConfig.header = "var pgsqlDBDriver = require('jsharmony-db-pgsql');\r\n";
+        appConfig.body += "  dbconfig['default'] = { _driver: new pgsqlDBDriver(), host: "+JSON.stringify(jshconfig.dbserver)+", database: "+JSON.stringify(jshconfig.dbname)+", user: "+JSON.stringify(jshconfig.dbuser)+", password: "+JSON.stringify(jshconfig.dbpass)+" };\r\n";
+      }
+      else if(jshconfig.dbtype=='mssql'){
+        appConfig.header = "var mssqlDBDriver = require('jsharmony-db-mssql');\r\n";
+        appConfig.body += "  dbconfig['default'] = { _driver: new mssqlDBDriver(), server: "+JSON.stringify(jshconfig.dbserver)+", database: "+JSON.stringify(jshconfig.dbname)+", user: "+JSON.stringify(jshconfig.dbuser)+", password: "+JSON.stringify(jshconfig.dbpass)+" };\r\n";
+      }
+      else if(jshconfig.dbtype=='sqlite'){
+        appConfig.header = "var sqliteDBDriver = require('jsharmony-db-sqlite');\r\n";
+        appConfig.body += "  dbconfig['default'] = { _driver: new sqliteDBDriver(), database: "+JSON.stringify(jshconfig.dbname)+" };\r\n";
+      }
+    }
+
+    //Save app.config.local.js to disk
+    var onComplete = function(err){
+      if(err) return reject(err);
+
+      var fdata = '';
+      if(appConfig.header) fdata += appConfig.header + "\r\n";
+      fdata += "exports = module.exports = function(jsh, config, dbconfig){\r\n";
+      fdata += "\r\n";
+      fdata += appConfig.body + "\r\n";
+      fdata += "}\r\n";
+      fs.writeFile(path.join(jshconfig.path, 'app.config.local.js'), fdata, 'utf8', function(err){
+        if(err) return reject(err);
+        return resolve();
+      });
+    };
+
+    jshcli_Shared.getModulePath('jsharmony-factory/init/install.app.config.local.js', function(err, mpath){
+      if(err) return installer_cb();
+      require(mpath)(appConfig, installerParams, onComplete);
+    });
+  }); })
+
   //Copy Client Portal files, if applicable
   .then(function(){ return new Promise(function(resolve, reject){
     if(!params.CLIENT_PORTAL) return resolve();
@@ -301,12 +339,12 @@ exports.Run = function(params, onSuccess){
   //Create jsHarmony Factory Database
   .then(function(){ return new Promise(function(resolve, reject){
     if(!global._CREATE_DATABASE){
-      console.log('\r\nPlease configure your database settings in '+jshconfig.path+'\\app.config.js');
+      console.log('\r\nPlease configure your database settings in '+path.join(jshconfig.path,'app.config.local.js'));
       console.log('Then run "jsharmony init database" to set up the jsHarmony Factory tables in the existing database');
       console.log('\r\nIf you decide to create a new database for the project, instead run "jsharmony create database" from the project root to automatically create the database.');
       return resolve();
     }
-    else jshcli_CreateDatabase.Run(params,resolve);
+    else jshcli_CreateDatabase.Run(params,{},resolve);
   }); })
 
   .then(function(){ return new Promise(function(resolve, reject){

@@ -23,24 +23,32 @@ var xlib = wclib.xlib;
 var path = require('path');
 var fs = require('fs');
 var _ = require('lodash');
+var jshcli_Shared = require('./lib/cli.shared.js'); 
 
 exports = module.exports = {};
 
-exports.Run = function(params, onSuccess){
+exports.Run = function(params, options, onSuccess){
+  if(!onSuccess) onSuccess = function(){};
+  options = _.extend({ showResultMessage: true, useDefaultSQLitePath: false }, options);
   console.log('\r\nRunning jsHarmony Factory DB Creation Scripts');
-  var cmd = ['run','-s','create-database','--'];
+  var cmdParams = ['--use-ipc'];
   if(typeof params.CLIENT_PORTAL != 'undefined'){
-    if(params.CLIENT_PORTAL) cmd.push('--with-client-portal');
-    else cmd.push('--no-client-portal');
+    if(params.CLIENT_PORTAL) cmdParams.push('--with-client-portal');
+    else cmdParams.push('--no-client-portal');
   }
-  xlib.spawn(global._NPM_CMD,cmd,function(code){ 
-    if(code==0){ 
-      if(onSuccess) onSuccess(); return;
+  if(options.useDefaultSQLitePath) cmdParams.push('--use-default-sqlite-path');
+  var jmsg = null;
+  jshcli_Shared.runModuleScript('jsharmony-factory/init/create.js', cmdParams,
+    {
+      onMessage: function(msg, handle){
+        try{ jmsg = JSON.parse(msg); }
+        catch(ex){  }
+        if(jmsg && jmsg.RESULT_MESSAGE && options.showResultMessage){ console.log('\r\n\r\n\r\n' + jmsg.RESULT_MESSAGE); }
+      }
+    },
+    function(errCode){
+      if(!errCode) return onSuccess(jmsg);
+      console.log('\r\nDatabase Creation failed.');
     }
-    console.log('\r\nDatabase Creation failed.');
-    var jsf_path = process.cwd()+'/node_modules/jsharmony-factory';
-    if(!fs.existsSync(jsf_path)) console.log('Please run the command from the project root, or verify that jsharmony-factory is installed in "'+jsf_path+'"');
-  },undefined,undefined,
-  function(err){ console.log('ERROR: Could not find or start '+global._NPM_CMD+'. Check to make sure Node.js and NPM is installed.'); },
-  { stdio: 'inherit' });
+  );
 }
