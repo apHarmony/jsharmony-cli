@@ -208,6 +208,11 @@ exports.Run = function(params, onSuccess){
       fdata += "exports = module.exports = function(jsh, config, dbconfig){\r\n";
       fdata += "\r\n";
       fdata += appConfig.body + "\r\n";
+      fdata += "  var configTutorials = config.modules['jsHarmonyTutorials'];\r\n";
+      fdata += "  if(configTutorials){\r\n";
+      fdata += "    //configTutorials.enable_dev = true;\r\n";
+      fdata += "  }\r\n";
+      fdata += "\r\n";
       fdata += "  config.onServerReady.push(function(cb, servers){\r\n";
       fdata += "    var port = jsh.Config.server.http_port;\r\n";
       fdata += "    if(jsh.Servers['default'] && jsh.Servers['default'].servers && jsh.Servers['default'].servers.length) port = jsh.Servers['default'].servers[0].address().port;\r\n";

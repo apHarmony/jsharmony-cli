@@ -57,7 +57,7 @@ exports.Run = function(params, onSuccess){
 
   var tmpdir = '';
   var projectFiles = [];
-  var ignoreItems = ['.git'];
+  var ignoreItems = ['.git','/package.json','/package-lock.json'];
   var manifest = {};
   var jsHarmonyFactoryScriptResult = null;
 
@@ -226,6 +226,7 @@ exports.Run = function(params, onSuccess){
           if (_.includes(ignoreItems, path.basename(fname))) return false;
           fname = fname.substr(rootPath.length);
           if(!fname) return false;
+          if (_.includes(ignoreItems, '/' + fname.split(path.sep).join('/'))) return false;
           projectFiles.push(fname);
           return fname;
         }
