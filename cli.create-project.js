@@ -57,7 +57,7 @@ exports.Run = function(params, onSuccess){
 
   var tmpdir = '';
   var projectFiles = [];
-  var ignoreItems = ['.git','/package.json','/package-lock.json'];
+  var ignoreItems = ['.git','/package.json','/package-lock.json','/yarn.lock'];
   var manifest = {};
   var jsHarmonyFactoryScriptResult = null;
 
