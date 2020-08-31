@@ -23,12 +23,11 @@ var xlib = wclib.xlib;
 var path = require('path');
 var fs = require('fs');
 var _ = require('lodash');
-var jshcli_InitDatabase = require('./cli.init-database.js');
 var jshcli_Shared = require('./lib/cli.shared.js'); 
 
 exports = module.exports = {};
 
-exports.Run = function(params, onSuccess){
+exports.Run = function(params, options, onSuccess){
   console.log('Running CreateEmpty operation...');
   console.log('\r\nConfiguration can be changed in the app.js file');
 

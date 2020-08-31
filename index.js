@@ -210,5 +210,5 @@ function ValidateParameters(onComplete){
 
 //Main Workflow
 ValidateParameters(function(cmd, params){
-  global.commands[cmd](params);
+  global.commands[cmd](params, { source: 'cli' });
 });

@@ -29,7 +29,7 @@ var jsfapi = null;
 
 exports = module.exports = {};
 
-exports.Run = function(params, onSuccess){
+exports.Run = function(params, options, onSuccess){
   console.log('Running Generate SQLObjects operation...');
 
   var jshconfig = {

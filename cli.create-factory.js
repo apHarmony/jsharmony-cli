@@ -28,7 +28,7 @@ var jshcli_Shared = require('./lib/cli.shared.js');
 
 exports = module.exports = {};
 
-exports.Run = function(params, onSuccess){
+exports.Run = function(params, options, onSuccess){
   console.log('Running CreateFactory operation...');
   console.log('\r\n*** jsHarmony Factory requires a PostgreSQL, SQL Server, or SQLite database');
 
@@ -138,13 +138,12 @@ exports.Run = function(params, onSuccess){
   "scripts": {\r\n\
     "start": "node app.js",\r\n\
     "install-windows-service": "winser -i",\r\n\
-    "uninstall-windows-service": "winser -r",\r\n\
-    "create-database": "node node_modules/jsharmony-factory/init/create.js",\r\n\
-    "init-database": "node node_modules/jsharmony-factory/init/init.js"\r\n\
+    "uninstall-windows-service": "winser -r"\r\n\
   },\r\n\
   "dependencies": {\r\n\
     "jsharmony": "^1.1.0",\r\n\
-    '+db_dependency+'\r\n\
+    '+db_dependency+'\r\n' + (params.CLIENT_PORTAL?'\
+    "jsharmony-report": "^1.0.0",\r\n':'') + '\
     "jsharmony-factory": "^1.1.0",\r\n\
     "jsharmony-validate": "^1.1.0",\r\n\
     "winser": "^1.0.2"\r\n\
@@ -252,7 +251,7 @@ exports.Run = function(params, onSuccess){
   //Create app.config.js
   .then(function(){ return new Promise(function(resolve, reject){
     var rslt = "exports = module.exports = function(jsh, config, dbconfig){\r\n";
-    rslt += "\r\n";
+    rslt += (params.CLIENT_PORTAL ? "  jsh.Extensions.report = require('jsharmony-report');\r\n" : "\r\n");
     rslt += "}\r\n";
     
     fs.writeFileSync(path.join(jshconfig.path,'app.config.js'), rslt);

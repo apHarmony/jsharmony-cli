@@ -31,10 +31,10 @@ var jshcli_Shared = require('./lib/cli.shared.js');
 
 exports = module.exports = {};
 
-exports.Run = function(params, onSuccess){
+exports.Run = function(params, options, onSuccess){
   console.log('Running CreateProject operation...');
 
-  var jshconfig = {
+  var jshconfig = _.extend({
     path: process.cwd(),
     dbserver: '___DB_SERVER___',
     dbname: '___DB_NAME___',
@@ -45,10 +45,10 @@ exports.Run = function(params, onSuccess){
     agreement_accepted: false,
     no_npm_install: false,
     auto_create_database: false,
-  };
-  jshconfig.projectname = path.basename(jshconfig.path) || 'application';
+    projectname: null,
+  }, global.default_jshconfig);
 
-  if(global.default_jshconfig) _.extend(jshconfig, global.default_jshconfig);
+  jshconfig.projectname = jshconfig.projectname || path.basename(jshconfig.path) || 'application';
 
   if(!params.URL){
     console.log('ERROR: The "create project" operation requires a URL parameter');
@@ -254,30 +254,12 @@ exports.Run = function(params, onSuccess){
 
   //Read manifest
   .then(function(){ return new Promise(function(resolve, reject){
-    fs.readFile(path.join(jshconfig.path, 'jsharmony.project.json'), 'utf8', function(err, data){
+    jshcli_Shared.readManifest(path.join(jshconfig.path, 'jsharmony.project.json'), function(err, _manifest){
       if(err){
         console.log('Error reading jsharmony.project.json');
         return reject(err);
       }
-      try{
-        manifest = JSON.parse(data);
-      }
-      catch(ex){
-        console.log('Error parsing jsharmony.project.json manifest');
-        return reject(ex);
-      }
-      if(!manifest) manifest = {};
-      manifest.installer = _.extend({
-        "jsharmony_factory": true,
-        "jsharmony_factory_client_portal": false,
-        "script_pre_install": null,
-        "script_post_install": null,
-        "executables": ["app.js"],
-        "generate_self_signed_certs": [], //{ "key": "cert/path.to.key", "cert": "cert/path.to.cert" }
-        "generate_nstart": true, //or ['path1','path2','path3']
-        "generate_gitignore": true, //or ['path1','path2','path3']
-        "auto_create_database": true,
-      }, manifest.installer);
+      manifest = _manifest;
       params.CLIENT_PORTAL = !!manifest.installer.jsharmony_factory_client_portal;
       return resolve();
     });
@@ -352,8 +334,6 @@ exports.Run = function(params, onSuccess){
     //jsHarmony Factory
     if(manifest.installer.jsharmony_factory){
       defaultPackage.scripts = _.extend({
-        "create-database": "node node_modules/jsharmony-factory/init/create.js",
-        "init-database": "node node_modules/jsharmony-factory/init/init.js"
       }, defaultPackage.scripts);
       defaultPackage.dependencies = _.extend({
         "jsharmony-factory": "^1.1.0",
@@ -390,9 +370,9 @@ exports.Run = function(params, onSuccess){
   
   //Call pre_install
   .then(function(){ return new Promise(function(resolve, reject){
-    if(!manifest.installer.script_pre_install) return resolve();
-    if(fs.existsSync(path.join(jshconfig.path,manifest.installer.script_pre_install))){
-      jshcli_Shared.runScript(path.join(jshconfig.path,manifest.installer.script_pre_install),[],{},function(errCode){
+    if(!manifest.installer.scripts.pre_install) return resolve();
+    if(fs.existsSync(path.join(jshconfig.path,manifest.installer.scripts.pre_install))){
+      jshcli_Shared.runScript(path.join(jshconfig.path,manifest.installer.scripts.pre_install),[],{},function(errCode){
         if(!errCode) return resolve();
       });
       return;
@@ -700,7 +680,10 @@ exports.Run = function(params, onSuccess){
       jshcli_CreateDatabase.Run(params,
         {
           showResultMessage: false,
-          useDefaultSQLitePath: (jshconfig.auto_create_database || manifest.installer.auto_create_database)
+          useDefaultSQLitePath: (jshconfig.auto_create_database || manifest.installer.auto_create_database),
+          preCreate: manifest.installer.scripts.pre_db_create,
+          preInit: manifest.installer.scripts.pre_db_init,
+          postInit: manifest.installer.scripts.post_db_init,
         },
         function(rslt){
           jsHarmonyFactoryScriptResult = rslt;
@@ -712,9 +695,9 @@ exports.Run = function(params, onSuccess){
 
   //Call post_install
   .then(function(){ return new Promise(function(resolve, reject){
-    if(!manifest.installer.script_post_install) return resolve();
-    if(fs.existsSync(path.join(jshconfig.path,manifest.installer.script_post_install))){
-      jshcli_Shared.runScript(path.join(jshconfig.path,manifest.installer.script_post_install),[],{},function(errCode){
+    if(!manifest.installer.scripts.post_install) return resolve();
+    if(fs.existsSync(path.join(jshconfig.path,manifest.installer.scripts.post_install))){
+      jshcli_Shared.runScript(path.join(jshconfig.path,manifest.installer.scripts.post_install),[],{},function(errCode){
         if(!errCode) return resolve();
       });
       return;

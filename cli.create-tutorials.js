@@ -23,13 +23,11 @@ var xlib = wclib.xlib;
 var path = require('path');
 var fs = require('fs');
 var _ = require('lodash');
-var jshcli_InitDatabase = require('./cli.init-database.js');
-var jshcli_CreateDatabase = require('./cli.create-database.js');
 var jshcli_Shared = require('./lib/cli.shared.js'); 
 
 exports = module.exports = {};
 
-exports.Run = function(params, onSuccess){
+exports.Run = function(params, options, onSuccess){
   console.log('Running CreateTutorials operation...');
 
   var jshconfig = {
@@ -100,13 +98,14 @@ exports.Run = function(params, onSuccess){
   "private": true,\r\n\
   "scripts": {\r\n\
     "start": "node app.js",\r\n\
-    "create-database": "node node_modules/jsharmony-factory/init/create.js",\r\n\
     "test-screenshots": "mocha node_modules/jsharmony-tutorials/test/screenshots.js"\r\n\
   },\r\n\
   "dependencies": {\r\n\
     "jsharmony": "^1.1.0",\r\n\
     '+db_dependency+'\r\n\
     "jsharmony-factory": "^1.1.0",\r\n\
+    "jsharmony-image-sharp": "^1.0.0",\r\n\
+    "jsharmony-report": "^1.0.0",\r\n\
     "jsharmony-validate": "^1.1.0",\r\n\
     "jsharmony-tutorials": "^1.0.0",\r\n\
     "winser": "^1.0.2"\r\n\
@@ -206,6 +205,9 @@ exports.Run = function(params, onSuccess){
       var fdata = '';
       if(appConfig.header) fdata += appConfig.header + "\r\n";
       fdata += "exports = module.exports = function(jsh, config, dbconfig){\r\n";
+      fdata += "\r\n";
+      fdata += "  jsh.Extensions.image = require('jsharmony-image-sharp');\r\n";
+      fdata += "  jsh.Extensions.report = require('jsharmony-report');\r\n";
       fdata += "\r\n";
       fdata += appConfig.body + "\r\n";
       fdata += "  var configTutorials = config.modules['jsHarmonyTutorials'];\r\n";
