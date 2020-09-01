@@ -469,6 +469,9 @@ exports.Run = function(params, options, onSuccess){
           function(executable_task_cb){
             if(global._IS_WINDOWS) return executable_task_cb();
             fdata = jshcli_Shared.dos2unix(fdata);
+            if(fdata.indexOf('#!') != 0){
+              fdata = '#!/usr/bin/env node\n\n' + fdata;
+            }
             fs.writeFile(fpath, fdata, function(err){
               if(err) return executable_task_cb(err);
               return executable_task_cb();
