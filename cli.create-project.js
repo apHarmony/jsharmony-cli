@@ -272,7 +272,7 @@ exports.Run = function(params, options, onSuccess){
     var dbtypes = {
       pgsql: 'PostgreSQL',
       mssql: 'SQL Server',
-      sqlite: 'SQLite (Built-in File Database)',
+      sqlite: 'SQLite (File DB - Use this if you won\'t install a database server)',
     };
     if(manifest.database && manifest.database.type){
       _.each(_.keys(dbtypes), function(dbtype){
