@@ -43,6 +43,7 @@ exports.Run = function(params, options, onSuccess){
           if(!exists) return run_cb();
           //Read project file
           jshcli_Shared.readManifest(path.join(jshconfig.path, 'jsharmony.project.json'), function(err, manifest){
+            if(err && err.code=='ENOENT') return run_cb();
             if(err) return run_cb(err);
             options.preInit = options.preInit || manifest.installer.scripts.pre_db_init;
             options.postInit = options.postInit || manifest.installer.scripts.post_db_init;
