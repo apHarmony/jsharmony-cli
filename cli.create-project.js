@@ -549,6 +549,7 @@ exports.Run = function(params, options, onSuccess){
     var appConfig = {
       header: '',
       body: '',
+      params: {},
     };
 
     var installerParams = {
