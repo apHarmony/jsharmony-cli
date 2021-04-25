@@ -70,7 +70,7 @@ Usage: jsharmony [command] [options]\r\n\
 The following commands are available:\r\n\
 \r\n\
 create factory       - Initializes a standard application\r\n\
-    --with-client-portal | --no-client-portal\r\n\
+    --with-client-portal | --no-client-portal | --with-sample-data | --admin-pass [PASSWORD]\r\n\
 create project [URL] - Initializes a jsHarmony Application from a Project URL\r\n\
                          * A local filesystem path can also be used\r\n\
 create empty         - Initializes empty scaffolding\r\n\
@@ -78,7 +78,7 @@ create tutorials     - Initializes the quickstart tutorials application\r\n\
 \r\n\
 create database      - Creates a new jsHarmony Factory database\r\n\
 init database        - Adds jsHarmony Factory tables to an existing database\r\n\
-    --with-client-portal | --no-client-portal\r\n\
+    --with-client-portal | --no-client-portal | --with-sample-data | --admin-pass [PASSWORD]\r\n\
 \r\n\
 generate models     - Auto-generate models based on the database schema\r\n\
     -t [DATABASE TABLE]  Database table name, or * for all tables (required)\r\n\
@@ -152,17 +152,24 @@ function ValidateParameters(onComplete){
     else if(cmd=='create factory'){
       if(arg == '--with-client-portal'){ params.CLIENT_PORTAL = true; continue; }
       else if(arg == '--no-client-portal'){ params.CLIENT_PORTAL = false; continue; }
+      else if(arg == '--with-sample-data'){ params.SAMPLE_DATA = true; continue; }
+      else if(arg == '--admin-pass'){ if(args.length === 0){ return sys_error('Missing PASSWORD: --admin-pass [PASSWORD]'); } params.ADMIN_PASS = args.shift(); continue; }
     }
     else if(cmd=='create project'){
       if(!params.URL){ params.URL = arg; continue; }
+      else if(arg == '--admin-pass'){ if(args.length === 0){ return sys_error('Missing PASSWORD: --admin-pass [PASSWORD]'); } params.ADMIN_PASS = args.shift(); continue; }
     }
     else if(cmd=='create database'){
       if(arg == '--with-client-portal'){ params.CLIENT_PORTAL = true; continue; }
       else if(arg == '--no-client-portal'){ params.CLIENT_PORTAL = false; continue; }
+      else if(arg == '--with-sample-data'){ params.SAMPLE_DATA = true; continue; }
+      else if(arg == '--admin-pass'){ if(args.length === 0){ return sys_error('Missing PASSWORD: --admin-pass [PASSWORD]'); } params.ADMIN_PASS = args.shift(); continue; }
     }
     else if(cmd=='init database'){
       if(arg == '--with-client-portal'){ params.CLIENT_PORTAL = true; continue; }
       else if(arg == '--no-client-portal'){ params.CLIENT_PORTAL = false; continue; }
+      else if(arg == '--with-sample-data'){ params.SAMPLE_DATA = true; continue; }
+      else if(arg == '--admin-pass'){ if(args.length === 0){ return sys_error('Missing PASSWORD: --admin-pass [PASSWORD]'); } params.ADMIN_PASS = args.shift(); continue; }
     }
     return sys_error('Invalid argument: '+arg);
   }

@@ -37,6 +37,19 @@ exports.Run = function(params, options, onSuccess){
   console.log('\r\nRunning jsHarmony Factory DB Creation Scripts');
 
   async.waterfall([
+
+    function(run_cb){
+      if(options.source != 'cli') return run_cb();
+      //Check if supervisor is installed
+      xlib.spawn(global._SUPERVISOR_CMD,[],function(code){},function(data){
+        global._FOUND_SUPERVISOR = true;
+        resolve();
+      },undefined,function(err){ 
+        global._FOUND_SUPERVISOR = false;
+        resolve();
+      });
+    },
+    
     function(run_cb){
       if(options.source == 'cli'){
         fs.exists(jshconfig.path, function(exists){
@@ -67,10 +80,13 @@ exports.Run = function(params, options, onSuccess){
       if(params.CLIENT_PORTAL) cmdParams.push('--with-client-portal');
       else cmdParams.push('--no-client-portal');
     }
+    if(params.SAMPLE_DATA) cmdParams.push('--with-sample-data');
+    if(global._FOUND_SUPERVISOR) cmdParams.push('--with-supervisor');
     if(options.useDefaultSQLitePath) cmdParams.push('--use-default-sqlite-path');
     if(options.preCreate){ cmdParams.push('--pre-create'); cmdParams.push(options.preCreate); }
     if(options.preInit){ cmdParams.push('--pre-init'); cmdParams.push(options.preInit); }
     if(options.postInit){ cmdParams.push('--post-init'); cmdParams.push(options.postInit); }
+    if(params.ADMIN_PASS){ cmdParams.push('--admin-pass'); cmdParams.push(params.ADMIN_PASS); }
 
     var jmsg = null;
     jshcli_Shared.runModuleScript('jsharmony-factory/init/create.js', cmdParams,

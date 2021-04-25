@@ -222,7 +222,7 @@ exports.Run = function(params, options, onSuccess){
   .then(xlib.getStringAsync(function(){
     global._INSTALL_SUPERVISOR = false;
     if(global._FOUND_SUPERVISOR) return false;
-    console.log('\r\nInstall "supervisor" package to auto-restart the jsHarmony server when models are updated?');
+    console.log('\r\nInstall "supervisor" package to auto-restart the jsHarmony server when models / programs are updated?');
     console.log('1) Yes');
     console.log('2) No');
   },function(rslt,retry){
@@ -236,6 +236,7 @@ exports.Run = function(params, options, onSuccess){
     if(!global._INSTALL_SUPERVISOR) return resolve();
     console.log('\r\nInstalling Node.js supervisor to auto-restart jsHarmony Factory');
     xlib.spawn(global._NPM_CMD,['install','-g','supervisor'],function(code){ resolve(); },function(data){
+      global._FOUND_SUPERVISOR = true;
       console.log(data);
     },undefined,function(err){ console.log('ERROR: Could not find or start '+global._NPM_CMD+'. Check to make sure Node.js and NPM are installed.'); });
   }); })

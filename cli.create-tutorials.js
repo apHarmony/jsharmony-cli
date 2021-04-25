@@ -242,7 +242,10 @@ exports.Run = function(params, options, onSuccess){
     console.log('');
     console.log('jsHarmony Tutorials have been initialized!');
     console.log('');
-    console.log('Start the tutorials by running '+(global._IS_WINDOWS?'':'./')+global._NSTART_CMD);
+    console.log('Start the tutorials by running:');
+    console.log('  '+(global._IS_WINDOWS?'':'./')+global._NSTART_CMD);
+    console.log('    or');
+    console.log('  node '+(global._IS_WINDOWS?'':'./app.js'));
     resolve();
   }); })
 
