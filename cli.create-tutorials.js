@@ -245,7 +245,7 @@ exports.Run = function(params, options, onSuccess){
     console.log('Start the tutorials by running:');
     console.log('  '+(global._IS_WINDOWS?'':'./')+global._NSTART_CMD);
     console.log('    or');
-    console.log('  node '+(global._IS_WINDOWS?'':'./app.js'));
+    console.log('  node '+(global._IS_WINDOWS?'app.js':'./app.js'));
     resolve();
   }); })
 
