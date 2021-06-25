@@ -111,7 +111,7 @@ exports.Run = function(params, options, onSuccess){
     "winser": "^1.0.2"\r\n\
   },\r\n\
   "devDependencies": {\r\n\
-    "mocha": "^7.2.0"\r\n\
+    "mocha": "^8.4.0"\r\n\
   }\r\n';
     rslt += "}\r\n";
     fs.writeFileSync(path.join(jshconfig.path,'package.json'), rslt);

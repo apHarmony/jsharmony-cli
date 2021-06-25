@@ -367,7 +367,7 @@ exports.Run = function(params, options, onSuccess){
       "lodash": "^4.17.19",
     };
     defaultPackage.devDependencies = {
-      "mocha": "^7.2.0"
+      "mocha": "^8.4.0"
     }
 
     if(!global._IS_WINDOWS){
