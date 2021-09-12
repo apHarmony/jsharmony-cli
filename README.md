@@ -28,23 +28,26 @@ Usage: jsharmony [command] [options]
 
 The following commands are available:
 
-create factory       - Initializes a standard application
+create factory        - Initializes a standard application
     --with-client-portal | --no-client-portal | --with-sample-data | --admin-pass [PASSWORD]
-create project [URL] - Initializes a jsHarmony Application from a Project URL
-                         * A local filesystem path can also be used
-create empty         - Initializes empty scaffolding
-create tutorials     - Initializes the quickstart tutorials application
+create project [NAME] - Initializes a jsHarmony application from the App Library
+    --path [PATH]         (optional) Local filesystem path to project source
+    --url [URL]           (optional) URL path to project source
+create empty          - Initializes empty scaffolding
+create tutorials      - Initializes the quickstart tutorials application
 
-create database      - Creates a new jsHarmony Factory database
-init database        - Adds jsHarmony Factory tables to an existing database
+create database       - Creates a new jsHarmony Factory database
+init database         - Adds jsHarmony Factory tables to an existing database
     --with-client-portal | --no-client-portal | --with-sample-data | --admin-pass [PASSWORD]
 
-generate models     - Auto-generate models based on the database schema
+For verbose diagnostic messages, append the -v flag
+
+generate models      - Auto-generate models based on the database schema
     -t [DATABASE TABLE]  Database table name, or * for all tables (required)
     -f [FILENAME]        Output filename (optional)
     -d [PATH]            Output path (optional)
     -db [DATABASE]      Target database (optional)
-generate sqlobjects - Auto-generate sqlobjects based on the database schema
+generate sqlobjects  - Auto-generate sqlobjects based on the database schema
     -t [DATABASE TABLE]  Database table name, or * for all tables (required)
     -f [FILENAME]        Output filename (optional)
     -d [PATH]            Output path (optional)

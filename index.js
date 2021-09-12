@@ -60,7 +60,7 @@ global._NPM_VER = '';
 global._NODE_VER = '';
 global._DEFAULT_SQLITE_PATH = 'data/db/project.db';
 
-global.debug = true;
+global.debug = false;
 global.help_text = "\r\n\
 -------------------\r\n\
 :::jsHarmony CLI:::\r\n\
@@ -69,28 +69,31 @@ Usage: jsharmony [command] [options]\r\n\
 \r\n\
 The following commands are available:\r\n\
 \r\n\
-create factory       - Initializes a standard application\r\n\
+create factory        - Initializes a standard application\r\n\
     --with-client-portal | --no-client-portal | --with-sample-data | --admin-pass [PASSWORD]\r\n\
-create project [URL] - Initializes a jsHarmony Application from a Project URL\r\n\
-                         * A local filesystem path can also be used\r\n\
-create empty         - Initializes empty scaffolding\r\n\
-create tutorials     - Initializes the quickstart tutorials application\r\n\
+create project [NAME] - Initializes a jsHarmony application from the App Library\r\n\
+    --path [PATH]         (optional) Local filesystem path to project source\r\n\
+    --url [URL]           (optional) URL path to project source\r\n\
+create empty          - Initializes empty scaffolding\r\n\
+create tutorials      - Initializes the quickstart tutorials application\r\n\
 \r\n\
-create database      - Creates a new jsHarmony Factory database\r\n\
-init database        - Adds jsHarmony Factory tables to an existing database\r\n\
+create database       - Creates a new jsHarmony Factory database\r\n\
+init database         - Adds jsHarmony Factory tables to an existing database\r\n\
     --with-client-portal | --no-client-portal | --with-sample-data | --admin-pass [PASSWORD]\r\n\
 \r\n\
-generate models     - Auto-generate models based on the database schema\r\n\
-    -t [DATABASE TABLE]  Database table name, or * for all tables (required)\r\n\
-    -f [FILENAME]        Output filename (optional)\r\n\
-    -d [PATH]            Output path (optional)\r\n\
-    -db [DATABASE]      Target database (optional)\r\n\
-generate sqlobjects - Auto-generate sqlobjects based on the database schema\r\n\
-    -t [DATABASE TABLE]  Database table name, or * for all tables (required)\r\n\
-    -f [FILENAME]        Output filename (optional)\r\n\
-    -d [PATH]            Output path (optional)\r\n\
-    -db [DATABASE]       Target database (optional)\r\n\
-    --with-data          Include data in generated models\r\n\
+For verbose diagnostic messages, append the -v flag\r\n\
+\r\n\
+generate models       - Auto-generate models based on the database schema\r\n\
+    -t [DATABASE TABLE]   Database table name, or * for all tables (required)\r\n\
+    -f [FILENAME]         Output filename (optional)\r\n\
+    -d [PATH]             Output path (optional)\r\n\
+    -db [DATABASE]        Target database (optional)\r\n\
+generate sqlobjects   - Auto-generate sqlobjects based on the database schema\r\n\
+    -t [DATABASE TABLE]   Database table name, or * for all tables (required)\r\n\
+    -f [FILENAME]         Output filename (optional)\r\n\
+    -d [PATH]             Output path (optional)\r\n\
+    -db [DATABASE]        Target database (optional)\r\n\
+    --with-data           Include data in generated models\r\n\
 ";
 global.commands = {
   'create factory': jshcli_CreateFactory.Run,
@@ -108,7 +111,7 @@ process.on('exit', function () {
   if(global.debug){
     var end_time = new Date();
     var runtime_ms = end_time - global.start_time;
-    //Log('Run time: '+(runtime_ms/1000)+' seconds');
+    Log('Run time: '+(runtime_ms/1000)+' seconds');
   }
 });
 
@@ -136,7 +139,8 @@ function ValidateParameters(onComplete){
   if(!(cmd in global.commands)){ return sys_error('INVALID COMMAND: '+cmd+"\r\n\r\nPlease run jsharmony without any arguments for arguments listing"); }
   while(args.length > 0){
     var arg = args.shift();
-    if(cmd=='generate models'){
+    if(arg=='-v'){ global.debug = true; continue; }
+    else if(cmd=='generate models'){
       if(arg == '-t'){ if(args.length === 0){ return sys_error('Missing DATABASE TABLE: -t [DATABASE TABLE]'); } params.DATABASE_TABLE = args.shift(); continue; }
       else if(arg == '-f'){ if(args.length === 0){ return sys_error('Missing FILENAME: -f [FILENAME]'); } params.OUTPUT_FILE = args.shift(); continue; }
       else if(arg == '-d'){ if(args.length === 0){ return sys_error('Missing FILENAME: -d [PATH]'); } params.OUTPUT_PATH = args.shift(); continue; }
@@ -156,8 +160,9 @@ function ValidateParameters(onComplete){
       else if(arg == '--admin-pass'){ if(args.length === 0){ return sys_error('Missing PASSWORD: --admin-pass [PASSWORD]'); } params.ADMIN_PASS = args.shift(); continue; }
     }
     else if(cmd=='create project'){
-      if(!params.URL){ params.URL = arg; continue; }
-      else if(arg == '--admin-pass'){ if(args.length === 0){ return sys_error('Missing PASSWORD: --admin-pass [PASSWORD]'); } params.ADMIN_PASS = args.shift(); continue; }
+      if(arg == '--path'){ if(args.length === 0){ return sys_error('Missing PATH: --path [PATH]'); } params.PATH = args.shift(); continue; }
+      else if(arg == '--url'){ if(args.length === 0){ return sys_error('Missing URL: --url [URL]'); } params.URL = args.shift(); continue; }
+      else if(!params.NAME){ params.NAME = arg; continue; }
     }
     else if(cmd=='create database'){
       if(arg == '--with-client-portal'){ params.CLIENT_PORTAL = true; continue; }

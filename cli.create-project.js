@@ -50,8 +50,8 @@ exports.Run = function(params, options, onSuccess){
 
   jshconfig.projectname = jshconfig.projectname || path.basename(jshconfig.path) || 'application';
 
-  if(!params.URL){
-    console.log('ERROR: The "create project" operation requires a URL parameter');
+  if(!params.NAME && !params.URL && !params.PATH){
+    console.log('ERROR: The "create project" operation requires a project NAME parameter :: the name of the project in the jsHarmony App Library');
     process.exit(1);
   }
 
@@ -101,7 +101,7 @@ exports.Run = function(params, options, onSuccess){
     console.log(jshconfig.path);
     console.log('=====================================================================');
     console.log('The project will be based on the following source:');
-    console.log(params.URL);
+    console.log(params.PATH||params.URL||params.NAME);
     console.log('=====================================================================');
     console.log('Continue with the operation?');
     console.log('1) Yes');
@@ -134,48 +134,72 @@ exports.Run = function(params, options, onSuccess){
       tmpdir = fpath;
       
       var targetPath = path.join(tmpdir, 'project.zip');
-      var projectURL = {};
-      try{
-        projectURL = URL.parse(params.URL);
-      }catch(ex){
-        throw new Error('Invalid URL: ' + params.URL);
-      }
 
-      if(_.includes(['http:','https:'], (projectURL.protocol||'').toLowerCase())){
-        wc.req(params.URL, 'GET', {}, {}, targetPath, function(err, res, rslt){
-          if(err){
-            console.log('-------------------------------------------');
-            console.log('Could not download project source zip file.');
-            console.log('-------------------------------------------');
-            return reject(err);
+      var download_PATH = function(download_cb){
+        if(fs.existsSync(params.PATH)){
+          var fstat = fs.lstatSync(params.PATH);
+          if(fstat.isDirectory()){
+            sourceDir = params.PATH;
+            return download_cb();
           }
-          if(rslt == '---SAVEDTOFILE---') return resolve();
           else {
-            console.log('Error downloading project');
-            console.log('Server Response: ' + rslt);
-            return reject('Could not download project');
+            jshcli_Shared.copyFile(params.PATH, targetPath, function(err){
+              if(err){
+                console.log('------------------------------------------');
+                console.log('Could not extract project source zip file.');
+                console.log('------------------------------------------');
+                return download_cb(err);
+              }
+              return download_cb();
+            });
           }
-        });
-      }
-      else if(fs.existsSync(params.URL)){
-        var fstat = fs.lstatSync(params.URL);
-        if(fstat.isDirectory()){
-          sourceDir = params.URL;
-          return resolve();
         }
-        else {
-          jshcli_Shared.copyFile(params.URL, targetPath, function(err){
+        else throw new Error('Invalid project source zip file: ' + params.PATH);
+      };
+
+      var download_URL = function(download_cb){
+        var projectURL = {};
+        try{
+          projectURL = URL.parse(params.URL);
+        }catch(ex){
+          throw new Error('Invalid URL: ' + params.URL);
+        }
+
+        if(_.includes(['http:','https:'], (projectURL.protocol||'').toLowerCase())){
+          wc.req(params.URL, 'GET', {}, {}, targetPath, function(err, res, rslt){
             if(err){
-              console.log('------------------------------------------');
-              console.log('Could not extract project source zip file.');
-              console.log('------------------------------------------');
-              return reject(err);
+              console.log('-------------------------------------------');
+              console.log('Could not download project source zip file.');
+              console.log('-------------------------------------------');
+              return download_cb(err);
             }
-            return resolve();
+            if(rslt == '---SAVEDTOFILE---') return download_cb();
+            else {
+              console.log('Error downloading project');
+              console.log('Server Response: ' + rslt);
+              return download_cb('Could not download project');
+            }
           });
         }
-      }
-      else throw new Error('Invalid project source zip file: ' + params.URL);
+        else {
+          return download_cb(new Error('Unsupported URL: '+params.URL));
+        }
+      };
+
+      var download_NAME = function(download_cb){
+        params.URL = 'https://library.jsharmony.com/download/'+params.NAME;
+        return download_URL(download_cb);
+      };
+
+      (
+        params.PATH ? download_PATH :
+        params.URL ? download_URL :
+        params.NAME ? download_NAME :
+        function(download_cb){ return download_cb(new Error('Project NAME not specified')); }
+      )(function(err){
+        if(err) return reject(err);
+        return resolve();
+      });
     });
   }); })
 
