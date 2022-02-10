@@ -21,14 +21,6 @@ var child_process = require('child_process');
 var exec = child_process.exec;
 var assert = require('assert');
 
-function isEmpty(obj) {
-    for(var key in obj) {
-        if(obj.hasOwnProperty(key))
-            return false;
-    }
-    return true;
-}
-
 describe('Output to STDOUT',function(){
   it('Display Usage', function (done) {
     exec('node index.js',function(error,stdout,stderr){

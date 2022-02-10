@@ -20,17 +20,15 @@ along with this package.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 var wclib = require('./lib/WebConnect.js');
-var wc = new wclib.WebConnect();
 var xlib = wclib.xlib;
 var path = require('path');
 var fs = require('fs');
-var _ = require('lodash');
 var os = require('os');
 
 var path_defaultConfig = path.join(os.homedir(),'jsharmony/cli.default.json');
 if(fs.existsSync(path_defaultConfig)){
   try{
-  global.default_jshconfig = JSON.parse(fs.readFileSync(path_defaultConfig,'utf8'));
+    global.default_jshconfig = JSON.parse(fs.readFileSync(path_defaultConfig,'utf8'));
   }
   catch(ex){
     throw new Error('Error reading default configuration from: '+path_defaultConfig);
@@ -132,7 +130,7 @@ function ValidateParameters(onComplete){
     if(i >= 3) args.push(val);
   });
   if(args.length === 0){ return console.log(global.help_text); }
-  var cmd = args.shift();
+  cmd = args.shift();
   if(cmd=='create') cmd += ' ' + args.shift();
   if(cmd=='init') cmd += ' ' + args.shift();
   if(cmd=='generate') cmd += ' ' + args.shift();

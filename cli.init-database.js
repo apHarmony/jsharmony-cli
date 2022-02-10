@@ -18,13 +18,12 @@ along with this package.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 var wclib = require('./lib/WebConnect.js');
-var wc = new wclib.WebConnect();
 var xlib = wclib.xlib;
 var path = require('path');
 var fs = require('fs');
 var _ = require('lodash');
 var async = require('async');
-var jshcli_Shared = require('./lib/cli.shared.js'); 
+var jshcli_Shared = require('./lib/cli.shared.js');
 
 exports = module.exports = {};
 
@@ -44,7 +43,7 @@ exports.Run = function(params, options, onSuccess){
       xlib.spawn(global._SUPERVISOR_CMD,[],function(code){},_.once(function(data){
         global._FOUND_SUPERVISOR = true;
         return run_cb();
-      }),undefined,function(err){ 
+      }),undefined,function(err){
         global._FOUND_SUPERVISOR = false;
         return run_cb();
       });
@@ -91,7 +90,7 @@ exports.Run = function(params, options, onSuccess){
       {
         onMessage: function(msg, handle){
           try{ jmsg = JSON.parse(msg); }
-          catch(ex){  }
+          catch(ex){ /* Do nothing */ }
           if(jmsg && jmsg.RESULT_MESSAGE && options.showResultMessage){ console.log('\r\n\r\n\r\n' + jmsg.RESULT_MESSAGE); }
         }
       },
@@ -101,4 +100,4 @@ exports.Run = function(params, options, onSuccess){
       }
     );
   });
-}
+};
