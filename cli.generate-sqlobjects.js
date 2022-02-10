@@ -85,6 +85,11 @@ exports.Run = function(params, options, onSuccess){
   .then(function(){ return new Promise(function(resolve, reject){
     var table = null;
     var tablestr = params.DATABASE_TABLE;
+    var ignore_jsharmony_schema = true;
+    if(tablestr == '***'){
+      tablestr = '*';
+      ignore_jsharmony_schema = false;
+    }
     if(tablestr && (tablestr != '*')){
       tablestr = tablestr.trim();
       table = { schema: '', name: '' };
@@ -95,7 +100,7 @@ exports.Run = function(params, options, onSuccess){
       }
       else table.name = tablestr;
     }
-    jsfapi.codegen.generateSQLObjects(table,{ db: params.DATABASE, withData: !!params.WITH_DATA },function(err, messages, rslt){
+    jsfapi.codegen.generateSQLObjects(table,{ db: params.DATABASE, withData: !!params.WITH_DATA, ignore_jsharmony_schema: ignore_jsharmony_schema },function(err, messages, rslt){
       if(err) return reject(err);
       if(messages.length > 0) gen_messages = gen_messages.concat(messages);
       sqlobjects = rslt;
