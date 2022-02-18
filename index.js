@@ -44,6 +44,7 @@ var jshcli_CreateTutorials = require('./cli.create-tutorials.js');
 var jshcli_CreateDatabase = require('./cli.create-database.js');
 var jshcli_InitDatabase = require('./cli.init-database.js');
 
+var jshcli_GenerateSalt = require('./cli.generate-salt.js');
 var jshcli_GenerateModels = require('./cli.generate-models.js');
 var jshcli_GenerateSQLObjects = require('./cli.generate-sqlobjects.js');
 
@@ -81,6 +82,9 @@ init database         - Adds jsHarmony Factory tables to an existing database\r\
 \r\n\
 For verbose diagnostic messages, append the -v flag\r\n\
 \r\n\
+generate salt         - Generate a random salt\r\n\
+    --no-symbols          Generate without symbols\r\n\
+    --length [LENGTH]     Generate salt with a certain length\r\n\
 generate models       - Auto-generate models based on the database schema\r\n\
     -t [DATABASE TABLE]   Database table name, or * for all tables (required)\r\n\
     -f [FILENAME]         Output filename (optional)\r\n\
@@ -100,6 +104,7 @@ global.commands = {
   'create database': jshcli_CreateDatabase.Run,
   'create project': jshcli_CreateProject.Run,
   'init database': jshcli_InitDatabase.Run,
+  'generate salt': jshcli_GenerateSalt.Run,
   'generate models': jshcli_GenerateModels.Run,
   'generate sqlobjects': jshcli_GenerateSQLObjects.Run,
 };
@@ -138,6 +143,10 @@ function ValidateParameters(onComplete){
   while(args.length > 0){
     var arg = args.shift();
     if(arg=='-v'){ global.debug = true; continue; }
+    else if(cmd=='generate salt'){
+      if(arg == '--no-symbols'){ params.NO_SYMBOLS = true; continue; }
+      if(arg == '--length'){ if(args.length === 0){ return sys_error('Missing LENGTH: --length [LENGTH]'); } params.LENGTH = args.shift(); continue; }
+    }
     else if(cmd=='generate models'){
       if(arg == '-t'){ if(args.length === 0){ return sys_error('Missing DATABASE TABLE: -t [DATABASE TABLE]'); } params.DATABASE_TABLE = args.shift(); continue; }
       else if(arg == '-f'){ if(args.length === 0){ return sys_error('Missing FILENAME: -f [FILENAME]'); } params.OUTPUT_FILE = args.shift(); continue; }

@@ -248,7 +248,7 @@ exports.Run = function(params, options, onSuccess){
       resolve();
     }); })
 
-    /*
+  /*
     //Run npm start
     .then(function(){ return new Promise(function(resolve, reject){
       console.log('\r\nStarting Tutorials');
