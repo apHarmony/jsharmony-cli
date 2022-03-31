@@ -45,6 +45,7 @@ var jshcli_CreateDatabase = require('./cli.create-database.js');
 var jshcli_InitDatabase = require('./cli.init-database.js');
 
 var jshcli_GenerateSalt = require('./cli.generate-salt.js');
+var jshcli_GenerateCert = require('./cli.generate-cert.js');
 var jshcli_GenerateModels = require('./cli.generate-models.js');
 var jshcli_GenerateSQLObjects = require('./cli.generate-sqlobjects.js');
 
@@ -85,6 +86,8 @@ For verbose diagnostic messages, append the -v flag\r\n\
 generate salt         - Generate a random salt\r\n\
     --no-symbols          Generate without symbols\r\n\
     --length [LENGTH]     Generate salt with a certain length\r\n\
+generate cert         - Generate a self-signed certificate\r\n\
+    --domain [DOMAIN]     Certificate domain (optional)\r\n\
 generate models       - Auto-generate models based on the database schema\r\n\
     -t [DATABASE TABLE]   Database table name, or * for all tables (required)\r\n\
     -f [FILENAME]         Output filename (optional)\r\n\
@@ -105,6 +108,7 @@ global.commands = {
   'create project': jshcli_CreateProject.Run,
   'init database': jshcli_InitDatabase.Run,
   'generate salt': jshcli_GenerateSalt.Run,
+  'generate cert': jshcli_GenerateCert.Run,
   'generate models': jshcli_GenerateModels.Run,
   'generate sqlobjects': jshcli_GenerateSQLObjects.Run,
 };
@@ -146,6 +150,9 @@ function ValidateParameters(onComplete){
     else if(cmd=='generate salt'){
       if(arg == '--no-symbols'){ params.NO_SYMBOLS = true; continue; }
       if(arg == '--length'){ if(args.length === 0){ return sys_error('Missing LENGTH: --length [LENGTH]'); } params.LENGTH = args.shift(); continue; }
+    }
+    else if(cmd=='generate cert'){
+      if(arg == '--domain'){ if(args.length === 0){ return sys_error('Missing DOMAIN: --domain [DOMAIN]'); } params.DOMAIN = args.shift(); continue; }
     }
     else if(cmd=='generate models'){
       if(arg == '-t'){ if(args.length === 0){ return sys_error('Missing DATABASE TABLE: -t [DATABASE TABLE]'); } params.DATABASE_TABLE = args.shift(); continue; }

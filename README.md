@@ -45,6 +45,8 @@ For verbose diagnostic messages, append the -v flag
 generate salt         - Generate a random salt
     --no-symbols          Generate without symbols
     --length [LENGTH]     Generate salt with a certain length
+generate cert         - Generate a self-signed certificate
+    --domain [DOMAIN]     Certificate domain (optional)
 generate models      - Auto-generate models based on the database schema
     -t [DATABASE TABLE]  Database table name, or * for all tables (required)
     -f [FILENAME]        Output filename (optional)
