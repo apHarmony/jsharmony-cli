@@ -62,6 +62,12 @@ exports.Run = function(params, options, onSuccess){
     function(dir_cb){
       jshcli_Shared.createFolderIfNotExists(path.join(jshconfig.path, 'test'), dir_cb);
     },
+    function(dir_cb){
+      jshcli_Shared.createFolderIfNotExists(path.join(jshconfig.path, 'test/app'), dir_cb);
+    },
+    function(dir_cb){
+      jshcli_Shared.createFolderIfNotExists(path.join(jshconfig.path, 'test/app/data'), dir_cb);
+    },
   ], function(err){
     if(err){
       console.log(err);
