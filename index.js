@@ -107,6 +107,7 @@ generate sqlobjects   - Auto-generate sqlobjects based on the database schema\r\
 test install           - Install jsharmony-test in the current project\r\n\
 test master screenshots- Recreate the master set of screenshots for tests\r\n\
 test screenshots       - Recreate comparison images and run comparison report\r\n\
+    --silent              Do not open comparison report afterwards\r\n\
 ";
 global.commands = {
   'create factory': jshcli_CreateFactory.Run,
@@ -203,6 +204,10 @@ function ValidateParameters(onComplete){
       else if(arg == '--with-sample-data'){ params.SAMPLE_DATA = true; continue; }
       else if(arg == '--admin-pass'){ if(args.length === 0){ return sys_error('Missing PASSWORD: --admin-pass [PASSWORD]'); } params.ADMIN_PASS = args.shift(); continue; }
     }
+    else if(cmd=='test screenshots'){
+      if(arg == '--silent'){ params.SILENT = true; continue; }
+    }
+
     return sys_error('Invalid argument: '+arg);
   }
   
