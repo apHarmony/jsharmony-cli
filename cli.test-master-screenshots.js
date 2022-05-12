@@ -39,7 +39,7 @@ exports.Run = function(params, options, onSuccess){
 
   async.waterfall([
     function(init_cb) {
-      jstapi = jshcli_Shared.jsHarmonyTestAPI(jshconfig, {});
+      jstapi = jshcli_Shared.jsHarmonyTestAPI(jshconfig, {configPath: params.CONFIG});
 
       jstapi.Init(init_cb);
     },
