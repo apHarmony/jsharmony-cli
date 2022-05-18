@@ -49,6 +49,10 @@ var jshcli_GenerateCert = require('./cli.generate-cert.js');
 var jshcli_GenerateModels = require('./cli.generate-models.js');
 var jshcli_GenerateSQLObjects = require('./cli.generate-sqlobjects.js');
 
+var jshcli_TestInstall = require('./cli.test-install.js');
+var jshcli_TestMasterScreenshots = require('./cli.test-master-screenshots.js');
+var jshcli_TestScreenshots = require('./cli.test-screenshots.js');
+
 global._IS_WINDOWS = /^win/.test(process.platform);
 global._NPM_CMD = global._IS_WINDOWS ? 'npm.cmd' : 'npm';
 global._NSTART_CMD = global._IS_WINDOWS ? 'nstart.cmd' : 'nstart.sh';
@@ -99,6 +103,13 @@ generate sqlobjects   - Auto-generate sqlobjects based on the database schema\r\
     -d [PATH]             Output path (optional)\r\n\
     -db [DATABASE]        Target database (optional)\r\n\
     --with-data           Include data in generated models\r\n\
+\r\n\
+test install           - Install jsharmony-test in the current project\r\n\
+test master screenshots- Recreate the master set of screenshots for tests\r\n\
+    --config [PATH]       (optional) Local filesystem path to an alternate test config file\r\n\
+test screenshots       - Recreate comparison images and run comparison report\r\n\
+    --config [PATH]       (optional) Local filesystem path to an alternate test config file\r\n\
+    --silent              Do not open comparison report afterwards\r\n\
 ";
 global.commands = {
   'create factory': jshcli_CreateFactory.Run,
@@ -111,6 +122,9 @@ global.commands = {
   'generate cert': jshcli_GenerateCert.Run,
   'generate models': jshcli_GenerateModels.Run,
   'generate sqlobjects': jshcli_GenerateSQLObjects.Run,
+  'test install': jshcli_TestInstall.Run,
+  'test master screenshots': jshcli_TestMasterScreenshots.Run,
+  'test screenshots': jshcli_TestScreenshots.Run,
 };
 global.start_time = new Date();
 
@@ -143,6 +157,8 @@ function ValidateParameters(onComplete){
   if(cmd=='create') cmd += ' ' + args.shift();
   if(cmd=='init') cmd += ' ' + args.shift();
   if(cmd=='generate') cmd += ' ' + args.shift();
+  if(cmd=='test') cmd += ' ' + args.shift();
+  if(cmd=='test master') cmd += ' ' + args.shift();
   if(!(cmd in global.commands)){ return sys_error('INVALID COMMAND: '+cmd+"\r\n\r\nPlease run jsharmony without any arguments for arguments listing"); }
   while(args.length > 0){
     var arg = args.shift();
@@ -190,6 +206,14 @@ function ValidateParameters(onComplete){
       else if(arg == '--with-sample-data'){ params.SAMPLE_DATA = true; continue; }
       else if(arg == '--admin-pass'){ if(args.length === 0){ return sys_error('Missing PASSWORD: --admin-pass [PASSWORD]'); } params.ADMIN_PASS = args.shift(); continue; }
     }
+    else if(cmd=='test master screenshots'){
+      if(arg == '--config'){ if(args.length === 0){ return sys_error('Missing PATH: --config [PATH]'); } params.CONFIG = args.shift(); continue; }
+    }
+    else if(cmd=='test screenshots'){
+      if(arg == '--config'){ if(args.length === 0){ return sys_error('Missing PATH: --config [PATH]'); } params.CONFIG = args.shift(); continue; }
+      else if(arg == '--silent'){ params.SILENT = true; continue; }
+    }
+
     return sys_error('Invalid argument: '+arg);
   }
   
