@@ -20,7 +20,6 @@ along with this package.  If not, see <http://www.gnu.org/licenses/>.
 var wclib = require('./lib/WebConnect.js');
 var xlib = wclib.xlib;
 var path = require('path');
-var fs = require('fs');
 var _ = require('lodash');
 var async = require('async');
 var jshcli_Shared = require('./lib/cli.shared.js');
