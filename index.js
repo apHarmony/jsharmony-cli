@@ -50,6 +50,7 @@ var jshcli_GenerateModels = require('./cli.generate-models.js');
 var jshcli_GenerateSQLObjects = require('./cli.generate-sqlobjects.js');
 
 var jshcli_TestInstall = require('./cli.test-install.js');
+var jshcli_TestRecorder = require('./cli.test-recorder.js');
 var jshcli_TestMasterScreenshots = require('./cli.test-master-screenshots.js');
 var jshcli_TestScreenshots = require('./cli.test-screenshots.js');
 
@@ -105,6 +106,8 @@ generate sqlobjects   - Auto-generate sqlobjects based on the database schema\r\
     --with-data           Include data in generated models\r\n\
 \r\n\
 test install           - Install jsharmony-test in the current project\r\n\
+test recorder          - Open a browser to record a new test\r\n\
+    --full-element-paths  (optional) Generate full element paths instead of shortest path\r\n\
 test master screenshots- Recreate the master set of screenshots for tests\r\n\
     --config [PATH]       (optional) Local filesystem path to an alternate test config file\r\n\
 test screenshots       - Recreate comparison images and run comparison report\r\n\
@@ -123,6 +126,7 @@ global.commands = {
   'generate models': jshcli_GenerateModels.Run,
   'generate sqlobjects': jshcli_GenerateSQLObjects.Run,
   'test install': jshcli_TestInstall.Run,
+  'test recorder': jshcli_TestRecorder.Run,
   'test master screenshots': jshcli_TestMasterScreenshots.Run,
   'test screenshots': jshcli_TestScreenshots.Run,
 };
@@ -205,6 +209,9 @@ function ValidateParameters(onComplete){
       else if(arg == '--no-client-portal'){ params.CLIENT_PORTAL = false; continue; }
       else if(arg == '--with-sample-data'){ params.SAMPLE_DATA = true; continue; }
       else if(arg == '--admin-pass'){ if(args.length === 0){ return sys_error('Missing PASSWORD: --admin-pass [PASSWORD]'); } params.ADMIN_PASS = args.shift(); continue; }
+    }
+    else if(cmd=='test recorder'){
+      if(arg == '--full-element-paths'){ params.FULL_ELEMENT_PATHS = true; continue; }
     }
     else if(cmd=='test master screenshots'){
       if(arg == '--config'){ if(args.length === 0){ return sys_error('Missing PATH: --config [PATH]'); } params.CONFIG = args.shift(); continue; }

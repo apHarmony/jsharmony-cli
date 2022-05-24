@@ -58,6 +58,15 @@ generate sqlobjects  - Auto-generate sqlobjects based on the database schema
     -d [PATH]            Output path (optional)
     -db [DATABASE]       Target database (optional)
     --with-data          Include data in generated models
+
+test install           - Install jsharmony-test in the current project
+test recorder          - Open a browser to record a new test
+    --full-element-paths  (optional) Generate full element paths instead of shortest path
+test master screenshots- Recreate the master set of screenshots for tests
+    --config [PATH]       (optional) Local filesystem path to an alternate test config file
+test screenshots       - Recreate comparison images and run comparison report
+    --config [PATH]       (optional) Local filesystem path to an alternate test config file
+    --silent              Do not open comparison report afterwards
 ```
 
 ## Examples
