@@ -64,8 +64,11 @@ test recorder          - Open a browser to record a new test
     --full-element-paths  (optional) Generate full element paths instead of shortest path
 test master screenshots- Recreate the master set of screenshots for tests
     --config [PATH]       (optional) Local filesystem path to an alternate test config file
+    --show-browser        Show the browser window used for screenshot capture
+    --silent              Do not open image review afterwards
 test screenshots       - Recreate comparison images and run comparison report
     --config [PATH]       (optional) Local filesystem path to an alternate test config file
+    --show-browser        Show the browser window used for screenshot capture
     --silent              Do not open comparison report afterwards
 ```
 
