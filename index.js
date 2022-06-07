@@ -110,8 +110,11 @@ test recorder          - Open a browser to record a new test\r\n\
     --full-element-paths  (optional) Generate full element paths instead of shortest path\r\n\
 test master screenshots- Recreate the master set of screenshots for tests\r\n\
     --config [PATH]       (optional) Local filesystem path to an alternate test config file\r\n\
+    --show-browser        Show the browser window used for screenshot capture\r\n\
+    --silent              Do not open image review afterwards\r\n\
 test screenshots       - Recreate comparison images and run comparison report\r\n\
     --config [PATH]       (optional) Local filesystem path to an alternate test config file\r\n\
+    --show-browser        Show the browser window used for screenshot capture\r\n\
     --silent              Do not open comparison report afterwards\r\n\
 ";
 global.commands = {
@@ -215,9 +218,12 @@ function ValidateParameters(onComplete){
     }
     else if(cmd=='test master screenshots'){
       if(arg == '--config'){ if(args.length === 0){ return sys_error('Missing PATH: --config [PATH]'); } params.CONFIG = args.shift(); continue; }
+      else if(arg == '--show-browser'){ params.SHOW_BROWSER = true; continue; }
+      else if(arg == '--silent'){ params.SILENT = true; continue; }
     }
     else if(cmd=='test screenshots'){
       if(arg == '--config'){ if(args.length === 0){ return sys_error('Missing PATH: --config [PATH]'); } params.CONFIG = args.shift(); continue; }
+      else if(arg == '--show-browser'){ params.SHOW_BROWSER = true; continue; }
       else if(arg == '--silent'){ params.SILENT = true; continue; }
     }
 
