@@ -42,10 +42,6 @@ exports.Run = function(params, options, onSuccess){
     function(test_cb) {
       jstapi.runComparison(test_cb);
     },
-    function(done_cb) {
-      console.log('test done');
-      done_cb();
-    }
   ], function(err){
     if(err){
       console.log(err);

@@ -29,7 +29,7 @@ exports = module.exports = {};
 exports.Run = function(params, options, onSuccess){
   if(!onSuccess) onSuccess = function(){};
   options = _.extend({ source: null  }, options);
-  console.log('\r\nAdding jsHarmony Test');
+  console.log('\r\nInstalling jsHarmony Test');
 
   var jshconfig = _.extend({
     path: process.cwd(),
@@ -51,11 +51,14 @@ exports.Run = function(params, options, onSuccess){
       });
     },
     function(run_cb){
-      xlib.spawn(global._NPM_CMD,['install', '--save-dev', 'jsharmony-test'],function(code){ run_cb(); },function(data){
-        console.log(data);
-      },undefined,function(err){
-        console.log('ERROR: Could not find or start '+global._NPM_CMD+'. Check to make sure Node.js and NPM is installed.');
-        run_cb(err);
+      jshcli_Shared.getModulePath('jsharmony-test', function(err, mpath){
+        if(!err) return run_cb();
+        xlib.spawn(global._NPM_CMD,['install', '--save-dev', 'jsharmony-test'],function(code){ run_cb(); },function(data){
+          console.log(data);
+        },undefined,function(err){
+          console.log('ERROR: Could not find or start '+global._NPM_CMD+'. Check to make sure Node.js and NPM is installed.');
+          run_cb(err);
+        });
       });
     },
     function(dir_cb){

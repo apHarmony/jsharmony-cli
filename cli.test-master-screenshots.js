@@ -42,10 +42,6 @@ exports.Run = function(params, options, onSuccess){
     function(test_cb) {
       jstapi.generateMaster(test_cb);
     },
-    function(done_cb) {
-      console.log('test done');
-      done_cb();
-    }
   ], function(err){
     if(err){
       console.log(err);
