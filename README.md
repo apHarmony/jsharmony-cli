@@ -58,6 +58,7 @@ generate sqlobjects  - Auto-generate sqlobjects based on the database schema
     -d [PATH]            Output path (optional)
     -db [DATABASE]       Target database (optional)
     --with-data          Include data in generated models
+    --where [WHERE]      WHERE clause for export data (optional)
 
 test install           - Install jsharmony-test in the current project
 test recorder          - Open a browser to record a new test

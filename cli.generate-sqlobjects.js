@@ -51,13 +51,14 @@ exports.Run = function(params, options, onSuccess){
       jsfapi.Init(function(){
         if(params.OUTPUT_PATH) sqlobjects_path = params.OUTPUT_PATH + '/';
         else if(params.OUTPUT_FILE) sqlobjects_path = path.dirname(params.OUTPUT_FILE) + '/';
-        else sqlobjects_path = jsfapi.jsh.Config.appbasepath + '/models/sql/objects/';
+        else sqlobjects_path = '';
         resolve();
       });
     }); })
 
     //Verify the output folder is accessible
     .then(xlib.getStringAsync(function(){
+      if(!sqlobjects_path) return false;
       if(fs.existsSync(sqlobjects_path)) return false;
 
       console.log('\r\nThe output folder is not accessible');
@@ -98,7 +99,7 @@ exports.Run = function(params, options, onSuccess){
         }
         else table.name = tablestr;
       }
-      jsfapi.codegen.generateSQLObjects(table,{ db: params.DATABASE, withData: !!params.WITH_DATA, ignore_jsharmony_schema: ignore_jsharmony_schema },function(err, messages, rslt){
+      jsfapi.codegen.generateSQLObjects(table,{ db: params.DATABASE, withData: !!params.WITH_DATA, dataFilter: params.WHERE, ignore_jsharmony_schema: ignore_jsharmony_schema },function(err, messages, rslt){
         if(err) return reject(err);
         if(messages.length > 0) gen_messages = gen_messages.concat(messages);
         sqlobjects = rslt;
@@ -131,6 +132,8 @@ exports.Run = function(params, options, onSuccess){
 
     //Verify if output files will be overwritten
     .then(xlib.getStringAsync(function(){
+      if(!sqlobjects_path) return false;
+
       //Check if any files will be overwritten
       var overwritten = [];
       if(params.OUTPUT_FILE){
@@ -157,6 +160,8 @@ exports.Run = function(params, options, onSuccess){
 
     //Save to disk
     .then(function(){ return new Promise(function(resolve, reject){
+      if(!sqlobjects_path) return resolve();
+
       if(params.OUTPUT_FILE){
         var txt = "";
         var sqlobjectcount = _.size(sqlobjects);
@@ -191,12 +196,23 @@ exports.Run = function(params, options, onSuccess){
 
     //Done
     .then(function(){
-      console.log("\r\n\r\nOperation complete.  The following sqlobjects have been generated: \r\n");
-      if(params.OUTPUT_FILE){
-        console.log(params.OUTPUT_FILE);
+      if(sqlobjects_path){
+        console.log("\r\n\r\nOperation complete.  The following sqlobjects have been generated: \r\n");
+        if(params.OUTPUT_FILE){
+          console.log(params.OUTPUT_FILE);
+        }
+        else{
+          for(let sqlobjectname in sqlobjects) console.log(sqlobjects_path + sqlobjectname + '.json');
+        }
       }
-      else{
-        for(let sqlobjectname in sqlobjects) console.log(sqlobjects_path + sqlobjectname + '.json');
+      else {
+        for(let sqlobjectname in sqlobjects){
+          var txt = "{\n";
+          txt += "  " + JSON.stringify(sqlobjectname) + ": ";
+          txt += sqlobjects[sqlobjectname].trim().replace(new RegExp("\n",'g'),"\n  "); // eslint-disable-line no-control-regex
+          txt += "\n}";
+          console.log(txt);
+        }
       }
     })
 

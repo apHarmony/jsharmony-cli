@@ -103,7 +103,8 @@ generate sqlobjects   - Auto-generate sqlobjects based on the database schema\r\
     -f [FILENAME]         Output filename (optional)\r\n\
     -d [PATH]             Output path (optional)\r\n\
     -db [DATABASE]        Target database (optional)\r\n\
-    --with-data           Include data in generated models\r\n\
+    --with-data           Include data in generated models (optional)\r\n\
+    --where [WHERE]       WHERE clause for export data (optional)\r\n\
 \r\n\
 test install           - Install jsharmony-test in the current project\r\n\
 test recorder          - Open a browser to record a new test\r\n\
@@ -189,6 +190,7 @@ function ValidateParameters(onComplete){
       else if(arg == '-d'){ if(args.length === 0){ return sys_error('Missing FILENAME: -d [PATH]'); } params.OUTPUT_PATH = args.shift(); continue; }
       else if(arg == '-db'){ if(args.length === 0){ return sys_error('Missing DATABASE: -db [PATH]'); } params.DATABASE = args.shift(); continue; }
       else if(arg == '--with-data'){ params.WITH_DATA = true; continue; }
+      else if(arg == '--where'){ if(args.length === 0){ return sys_error('Missing WHERE clause: -where [WHERE]'); } params.WHERE = args.shift(); continue; }
     }
     else if(cmd=='create factory'){
       if(arg == '--with-client-portal'){ params.CLIENT_PORTAL = true; continue; }
