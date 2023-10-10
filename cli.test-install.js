@@ -54,7 +54,7 @@ exports.Run = function(params, options, onSuccess){
       jshcli_Shared.getModulePath('jsharmony-test', function(err, mpath){
         if(!err) return run_cb();
         xlib.spawn(global._NPM_CMD,['install', '--save-dev', 'jsharmony-test'],function(code){ run_cb(); },function(data){
-          console.log(data);
+          if(data && data.trim()) console.log(data);
         },undefined,function(err){
           console.log('ERROR: Could not find or start '+global._NPM_CMD+'. Check to make sure Node.js and NPM is installed.');
           run_cb(err);

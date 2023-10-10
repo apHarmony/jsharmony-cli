@@ -71,6 +71,11 @@ test screenshots       - Recreate comparison images and run comparison report
     --config [PATH]       (optional) Local filesystem path to an alternate test config file
     --show-browser        Show the browser window used for screenshot capture
     --silent              Do not open comparison report afterwards
+
+watch [path1] [path2]  - Watch paths for changes
+    --exec [CMD]             (optional) Shell command to execute on change
+    --exec-for [REGEX] [CMD] (optional) Shell command to execute on change for path regex
+    --notify-port [PORT]     (optional) HTTP Endpoint that notifies clients of changes
 ```
 
 ## Examples

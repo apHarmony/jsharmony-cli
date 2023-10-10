@@ -54,6 +54,8 @@ var jshcli_TestRecorder = require('./cli.test-recorder.js');
 var jshcli_TestMasterScreenshots = require('./cli.test-master-screenshots.js');
 var jshcli_TestScreenshots = require('./cli.test-screenshots.js');
 
+var jshcli_Watch = require('./cli.watch.js');
+
 global._IS_WINDOWS = /^win/.test(process.platform);
 global._NPM_CMD = global._IS_WINDOWS ? 'npm.cmd' : 'npm';
 global._NSTART_CMD = global._IS_WINDOWS ? 'nstart.cmd' : 'nstart.sh';
@@ -106,17 +108,22 @@ generate sqlobjects   - Auto-generate sqlobjects based on the database schema\r\
     --with-data           Include data in generated models (optional)\r\n\
     --where [WHERE]       WHERE clause for export data (optional)\r\n\
 \r\n\
-test install           - Install jsharmony-test in the current project\r\n\
-test recorder          - Open a browser to record a new test\r\n\
+test install          - Install jsharmony-test in the current project\r\n\
+test recorder         - Open a browser to record a new test\r\n\
     --full-element-paths  (optional) Generate full element paths instead of shortest path\r\n\
 test master screenshots- Recreate the master set of screenshots for tests\r\n\
     --config [PATH]       (optional) Local filesystem path to an alternate test config file\r\n\
     --show-browser        Show the browser window used for screenshot capture\r\n\
     --silent              Do not open image review afterwards\r\n\
-test screenshots       - Recreate comparison images and run comparison report\r\n\
+test screenshots      - Recreate comparison images and run comparison report\r\n\
     --config [PATH]       (optional) Local filesystem path to an alternate test config file\r\n\
     --show-browser        Show the browser window used for screenshot capture\r\n\
     --silent              Do not open comparison report afterwards\r\n\
+\r\n\
+watch [path1] [path2]  - Watch paths for changes\r\n\
+    --exec [CMD]             (optional) Shell command to execute on change\r\n\
+    --exec-for [REGEX] [CMD] (optional) Shell command to execute on change for path regex\r\n\
+    --notify-port [PORT]     (optional) HTTP Endpoint that notifies clients of changes\r\n\
 ";
 global.commands = {
   'create factory': jshcli_CreateFactory.Run,
@@ -133,6 +140,7 @@ global.commands = {
   'test recorder': jshcli_TestRecorder.Run,
   'test master screenshots': jshcli_TestMasterScreenshots.Run,
   'test screenshots': jshcli_TestScreenshots.Run,
+  'watch': jshcli_Watch.Run,
 };
 global.start_time = new Date();
 
@@ -227,6 +235,13 @@ function ValidateParameters(onComplete){
       if(arg == '--config'){ if(args.length === 0){ return sys_error('Missing PATH: --config [PATH]'); } params.CONFIG = args.shift(); continue; }
       else if(arg == '--show-browser'){ params.SHOW_BROWSER = true; continue; }
       else if(arg == '--silent'){ params.SILENT = true; continue; }
+    }
+    else if(cmd=='watch'){
+      if(!params.EXEC) params.EXEC = [];
+      if(arg == '--notify-port'){ if(args.length === 0){ return sys_error('Missing PORT: --notify-port [PORT]'); } params.NOTIFY_PORT = args.shift(); continue; }
+      else if(arg == '--exec'){ if(args.length === 0){ return sys_error('Missing CMD: --exec [CMD]'); } params.EXEC.push({ cmd: args.shift() }); continue; }
+      else if(arg == '--exec-for'){ if(args.length < 2){ return sys_error('Missing PORT: --exec-for [REX] [CMD]'); } params.EXEC.push({ for: args.shift(), cmd: args.shift() }); continue; }
+      else { if(!params.PATHS) params.PATHS = [];  params.PATHS.push(arg); continue; }
     }
 
     return sys_error('Invalid argument: '+arg);
