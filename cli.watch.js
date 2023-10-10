@@ -55,7 +55,7 @@ exports.Run = function(params, options, onSuccess){
     var notifyPort = parseInt(options.notifyPort);
     if(!notifyPort || (notifyPort.toString()!==options.notifyPort.toString())){ console.log('Invalid --notify-port parameter: '+options.notifyPort); return; }
 
-    var notifyServer = http.createServer(function(req, res){
+    notifyServer = http.createServer(function(req, res){
       res.writeHead(200, { 'Content-Type': 'text/plain' });
       res.end('Change Listener');
     });
@@ -74,9 +74,9 @@ exports.Run = function(params, options, onSuccess){
         var str = JSON.stringify('CHANGE');
         const strlen = Buffer.byteLength(str);
         const buffer = Buffer.alloc(2 + strlen);
-        buffer.writeUInt8(0b10000001, 0); 
-        buffer.writeUInt8(strlen, 1); 
-        buffer.write(str, 2); 
+        buffer.writeUInt8(0b10000001, 0);
+        buffer.writeUInt8(strlen, 1);
+        buffer.write(str, 2);
         socket.write(buffer);
       };
       notifyOperations.push(changeClientFunc);
@@ -108,7 +108,7 @@ exports.Run = function(params, options, onSuccess){
       if(!fname){ return; }
       var fpath = path.join(watchPath,fname);
       var fstat = null;
-      try{ fstat = fs.lstatSync(fpath); } catch(ex) {}
+      try{ fstat = fs.lstatSync(fpath); } catch(ex) { /* Do nothing */ }
       if(fstat && fstat.isFile()){
         if(!pendingNotification){
           console.log('>> Change @ '+(new Date().toString()));
