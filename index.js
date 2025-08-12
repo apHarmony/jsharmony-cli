@@ -175,7 +175,7 @@ function ValidateParameters(onComplete){
   if(cmd=='create') cmd += ' ' + args.shift();
   if(cmd=='init') cmd += ' ' + args.shift();
   if(cmd=='generate') cmd += ' ' + args.shift();
-  if(cmd=='test') cmd += ' ' + args.shift();
+  if(cmd=='test') cmd += ' ' + (args.shift()||'');
   if(cmd=='test master') cmd += ' ' + args.shift();
   if(!(cmd in global.commands)){ return sys_error('INVALID COMMAND: '+cmd+"\r\n\r\nPlease run jsharmony without any arguments for arguments listing"); }
   while(args.length > 0){
