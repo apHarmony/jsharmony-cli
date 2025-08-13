@@ -160,7 +160,7 @@ exports.Run = function(params, options, onSuccess){
           if(parseInt(global._NPM_VER[0])>=3) return resolve();
           console.log('ERROR: Please upgrade your NPM version to 3 or higher');
         }
-      },undefined,function(err){ console.log('ERROR: Could not find or start '+global._NPM_CMD+'. Check to make sure Node.js and NPM is installed.'); });
+      },undefined,function(err){ console.log('ERROR: Could not find or start '+global._NPM_CMD+'. Check to make sure Node.js and NPM is installed.'); }, {shell: true});
     }); })
 
     //Run npm install
@@ -168,7 +168,7 @@ exports.Run = function(params, options, onSuccess){
       console.log('\r\nInstalling local dependencies');
       xlib.spawn(global._NPM_CMD,['install'],function(code){ resolve(); },function(data){
         console.log(data);
-      },undefined,function(err){ console.log('ERROR: Could not find or start '+global._NPM_CMD+'. Check to make sure Node.js and NPM is installed.'); });
+      },undefined,function(err){ console.log('ERROR: Could not find or start '+global._NPM_CMD+'. Check to make sure Node.js and NPM is installed.'); }, {shell: true});
     }); })
 
     //Create app.config.js
