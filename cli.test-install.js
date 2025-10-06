@@ -48,7 +48,7 @@ exports.Run = function(params, options, onSuccess){
       },undefined,function(err){
         console.log('ERROR: Could not find or start '+global._NPM_CMD+'. Check to make sure Node.js and NPM is installed.');
         run_cb(err);
-      });
+      }, {shell: true});
     },
     function(run_cb){
       jshcli_Shared.getModulePath('jsharmony-test', function(err, mpath){
@@ -58,7 +58,7 @@ exports.Run = function(params, options, onSuccess){
         },undefined,function(err){
           console.log('ERROR: Could not find or start '+global._NPM_CMD+'. Check to make sure Node.js and NPM is installed.');
           run_cb(err);
-        });
+        }, {shell: true});
       });
     },
     function(dir_cb){

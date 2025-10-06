@@ -46,7 +46,7 @@ exports.Run = function(params, options, onSuccess){
       }),undefined,function(err){
         global._FOUND_SUPERVISOR = false;
         return run_cb();
-      });
+      }, {shell: true});
     },
 
     function(run_cb){

@@ -130,7 +130,7 @@ exports.Run = function(params, options, onSuccess){
       rslt += '  "name": '+JSON.stringify(jshconfig.projectname)+',\r\n';
       var db_dependency = '';
       if(jshconfig.dbtype=='pgsql') db_dependency = '"jsharmony-db-pgsql": "^1.1.0",';
-      else if(jshconfig.dbtype=='mssql') db_dependency = '"jsharmony-db-mssql": "^1.1.0",';
+      else if(jshconfig.dbtype=='mssql') db_dependency = '"jsharmony-db-mssql": "^2.1.0",';
       else if(jshconfig.dbtype=='sqlite') db_dependency = '"jsharmony-db-sqlite": "^1.1.0",';
       rslt += '  "version": "0.0.1",\r\n\
   "private": true,\r\n\
@@ -237,7 +237,7 @@ exports.Run = function(params, options, onSuccess){
       xlib.spawn(global._NPM_CMD,['install','-g','supervisor'],function(code){ resolve(); },function(data){
         global._FOUND_SUPERVISOR = true;
         console.log(data);
-      },undefined,function(err){ console.log('ERROR: Could not find or start '+global._NPM_CMD+'. Check to make sure Node.js and NPM are installed.'); });
+      },undefined,function(err){ console.log('ERROR: Could not find or start '+global._NPM_CMD+'. Check to make sure Node.js and NPM are installed.'); }, {shell: true});
     }); })
 
     //Run npm install

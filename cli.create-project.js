@@ -416,7 +416,7 @@ exports.Run = function(params, options, onSuccess){
       //Database
       if(jshconfig.dbtype){
         if(jshconfig.dbtype=='pgsql') defaultPackage.dependencies["jsharmony-db-pgsql"] = "^1.1.0";
-        else if(jshconfig.dbtype=='mssql') defaultPackage.dependencies["jsharmony-db-mssql"] = "^1.1.0";
+        else if(jshconfig.dbtype=='mssql') defaultPackage.dependencies["jsharmony-db-mssql"] = "^2.0.0";
         else if(jshconfig.dbtype=='sqlite') defaultPackage.dependencies["jsharmony-db-sqlite"] = "^1.1.0";
       }
 
@@ -478,7 +478,7 @@ exports.Run = function(params, options, onSuccess){
           if(parseInt(global._NPM_VER[0])>=6) return resolve();
           console.log('ERROR: Please upgrade your NPM version to 6 or higher');
         }
-      },undefined,function(err){ console.log('ERROR: Could not find or start '+global._NPM_CMD+'. Check to make sure Node.js and NPM are installed.'); });
+      },undefined,function(err){ console.log('ERROR: Could not find or start '+global._NPM_CMD+'. Check to make sure Node.js and NPM are installed.'); }, {shell: true});
     }); })
 
     //Check if supervisor is installed
@@ -490,7 +490,7 @@ exports.Run = function(params, options, onSuccess){
       },undefined,function(err){
         global._FOUND_SUPERVISOR = false;
         resolve();
-      });
+      }, {shell: true});
     }); })
 
     //Ask user to install supervisor
@@ -514,7 +514,7 @@ exports.Run = function(params, options, onSuccess){
       xlib.spawn(global._NPM_CMD,['install','-g','supervisor'],function(code){ resolve(); },function(data){
         global._FOUND_SUPERVISOR = true;
         console.log(data);
-      },undefined,function(err){ console.log('ERROR: Could not find or start '+global._NPM_CMD+'. Check to make sure Node.js and NPM are installed.'); });
+      },undefined,function(err){ console.log('ERROR: Could not find or start '+global._NPM_CMD+'. Check to make sure Node.js and NPM are installed.'); }, {shell: true});
     }); })
 
     //Run npm install
@@ -523,7 +523,7 @@ exports.Run = function(params, options, onSuccess){
       console.log('\r\nInstalling local dependencies');
       xlib.spawn(global._NPM_CMD,['install'],function(code){ resolve(); },function(data){
         console.log(data);
-      },undefined,function(err){ console.log('ERROR: Could not find or start '+global._NPM_CMD+'. Check to make sure Node.js and NPM are installed.'); });
+      },undefined,function(err){ console.log('ERROR: Could not find or start '+global._NPM_CMD+'. Check to make sure Node.js and NPM are installed.'); }, {shell: true});
     }); })
 
     //Run dos2unix on executable JS
