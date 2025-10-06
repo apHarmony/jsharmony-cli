@@ -249,13 +249,10 @@ exports.Run = function(params, options, onSuccess){
 
     //Check if supervisor is installed
     .then(function(){ return new Promise(function(resolve, reject){
-      xlib.spawn(global._SUPERVISOR_CMD,[],function(code){},function(data){
+      global._FOUND_SUPERVISOR = false;
+      xlib.spawn(global._SUPERVISOR_CMD,[],function(code){ resolve(); },function(data){
         global._FOUND_SUPERVISOR = true;
-        resolve();
-      },undefined,function(err){
-        global._FOUND_SUPERVISOR = false;
-        resolve();
-      }, {shell: true});
+      },undefined,undefined, {shell: true});
     }); })
 
     //Ask user to install supervisor

@@ -40,13 +40,10 @@ exports.Run = function(params, options, onSuccess){
     function(run_cb){
       if(options.source != 'cli') return run_cb();
       //Check if supervisor is installed
-      xlib.spawn(global._SUPERVISOR_CMD,[],function(code){},_.once(function(data){
+      global._FOUND_SUPERVISOR = false;
+      xlib.spawn(global._SUPERVISOR_CMD,[],function(code){ run_cb(); },_.once(function(data){
         global._FOUND_SUPERVISOR = true;
-        return run_cb();
-      }),undefined,function(err){
-        global._FOUND_SUPERVISOR = false;
-        return run_cb();
-      }, {shell: true});
+      }),undefined,undefined, {shell: true});
     },
 
     function(run_cb){
