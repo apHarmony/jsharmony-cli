@@ -386,8 +386,7 @@ exports.Run = function(params, options, onSuccess){
       };
       defaultPackage.dependencies = {
         "async": "^2.6.2",
-        "jsharmony": "^1.1.0",
-        "jsharmony-validate": "^1.1.0",
+        "jsharmony": "^2.0.0",
         "lodash": "^4.17.19",
       };
       defaultPackage.devDependencies = {
@@ -409,7 +408,7 @@ exports.Run = function(params, options, onSuccess){
         defaultPackage.scripts = _.extend({
         }, defaultPackage.scripts);
         defaultPackage.dependencies = _.extend({
-          "jsharmony-factory": "^1.1.0",
+          "jsharmony-factory": "^2.0.0",
         }, defaultPackage.dependencies);
       }
 

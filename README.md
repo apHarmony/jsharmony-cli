@@ -89,6 +89,9 @@ dev [SCRIPT]           - Run the jsHarmony app, and auto-restart when files chan
     --ext [EXTENSIONS]       (optional) Comma-separated file extensions to watch, or * for all
                                (default: node,js,json,css,sql,styl)
     Short aliases: -w (--watch), -i (--exclude), -e (--ext).  Options can be repeated.
+
+For automated input (scripts, AI agents), the following flags are available for all commands:
+  --no-tty      Send command-line arguments without interactive console / raw-mode input
 ```
 
 ## Examples

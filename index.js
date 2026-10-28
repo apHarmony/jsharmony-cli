@@ -134,6 +134,9 @@ dev [SCRIPT]           - Run the jsHarmony app, and auto-restart when files chan
     --ext [EXTENSIONS]       (optional) Comma-separated file extensions to watch, or * for all\r\n\
                                (default: node,js,json,css,sql,styl)\r\n\
     Short aliases: -w (--watch), -i (--exclude), -e (--ext).  Options can be repeated.\r\n\
+\r\n\
+    For automated input (scripts, AI agents), the following flags are available for all commands:\r\n\
+      --no-tty      Send command-line arguments without interactive console / raw-mode input\r\n\
 ";
 global.commands = {
   'create factory': jshcli_CreateFactory.Run,
@@ -190,6 +193,7 @@ function ValidateParameters(onComplete){
   while(args.length > 0){
     var arg = args.shift();
     if(arg=='-v'){ global.debug = true; continue; }
+    else if(arg=='--no-tty'){ process.env.JSHARMONY_NO_TTY = '1'; continue; }
     else if(cmd=='generate salt'){
       if(arg == '--no-symbols'){ params.NO_SYMBOLS = true; continue; }
       if(arg == '--length'){ if(args.length === 0){ return sys_error('Missing LENGTH: --length [LENGTH]'); } params.LENGTH = args.shift(); continue; }

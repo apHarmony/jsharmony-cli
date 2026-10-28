@@ -100,13 +100,12 @@ exports.Run = function(params, options, onSuccess){
     "test-screenshots": "mocha node_modules/jsharmony-tutorials/test/screenshots.js"\r\n\
   },\r\n\
   "dependencies": {\r\n\
-    "jsharmony": "^1.1.0",\r\n\
+    "jsharmony": "^2.0.0",\r\n\
     '+db_dependency+'\r\n\
-    "jsharmony-factory": "^1.1.0",\r\n\
+    "jsharmony-factory": "^2.0.0",\r\n\
     "jsharmony-image-sharp": "^1.0.0",\r\n\
     "jsharmony-report": "^1.0.0",\r\n\
-    "jsharmony-validate": "^1.1.0",\r\n\
-    "jsharmony-tutorials": "^1.0.0",\r\n\
+    "jsharmony-tutorials": "^2.0.0",\r\n\
     "winser": "^1.0.2"\r\n\
   },\r\n\
   "devDependencies": {\r\n\
